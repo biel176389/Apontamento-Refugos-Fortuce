@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#24272c" />
+  <title>Apontamento de Refugos Fortuce</title>
+  <style>
+    :root {
+      --red: #d82932; --red-dark: #b91f28; --graphite: #24272c;
+      --gray: #737780; --line: #e2e5e9; --bg: #f4f5f7;
+      --white: #fff; --text: #24272c; --muted: #707782;
+      --green: #18794e; --shadow: 0 12px 30px rgba(26, 31, 38, .08);
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.45 Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
+    button, input, select, textarea { font: inherit; }
+    button { cursor: pointer; }
+    .hidden { display: none !important; }
+    .auth-wrap { min-height: 100vh; display: grid; place-items: center; padding: 24px; background: radial-gradient(circle at top right, #f8dfe1 0, transparent 34%), var(--bg); }
+    .auth-card { width: min(100%, 440px); background: var(--white); border: 1px solid var(--line); border-radius: 20px; padding: 30px; box-shadow: var(--shadow); }
+    .brand { display: flex; align-items: center; gap: 13px; }
+    .brand-mark { width: 48px; height: 48px; border-radius: 13px; display: grid; place-items: center; background: var(--red); color: white; font-size: 23px; font-weight: 900; letter-spacing: -1px; }
+    .brand-title { font-size: 15px; font-weight: 850; letter-spacing: .045em; line-height: 1.25; }
+    .brand-sub { color: var(--red); font-weight: 800; font-size: 12px; letter-spacing: .16em; margin-top: 4px; }
+    h1 { font-size: 24px; line-height: 1.2; margin: 26px 0 7px; }
+    .muted { color: var(--muted); }
+    .small { font-size: 12px; }
+    .field { display: grid; gap: 7px; margin: 15px 0; }
+    label { font-weight: 700; font-size: 13px; }
+    input, select, textarea { width: 100%; border: 1px solid #d9dde2; background: #fff; border-radius: 10px; padding: 12px 13px; outline: none; color: var(--text); }
+    input:focus, select:focus, textarea:focus { border-color: var(--red); box-shadow: 0 0 0 3px rgba(216,41,50,.1); }
+    textarea { min-height: 88px; resize: vertical; }
+    .btn { border: 0; border-radius: 10px; padding: 12px 16px; font-weight: 750; transition: .15s ease; }
+    .btn-primary { background: var(--red); color: #fff; }
+    .btn-primary:hover { background: var(--red-dark); }
+    .btn-secondary { background: #f0f1f3; color: var(--text); }
+    .btn-link { color: var(--red); background: transparent; padding: 8px 0; font-weight: 750; }
+    .full { width: 100%; }
+    .error { color: #b4232c; background: #fff0f1; border: 1px solid #ffd1d4; border-radius: 9px; padding: 10px 12px; font-size: 13px; margin-top: 12px; }
+    .app { min-height: 100vh; display: grid; grid-template-columns: 250px minmax(0,1fr); }
+    aside { background: var(--graphite); color: #fff; padding: 24px 16px; display: flex; flex-direction: column; gap: 26px; }
+    aside .brand-title { color: #fff; font-size: 13px; }
+    aside .brand-mark { width: 42px; height: 42px; }
+    .nav-label { text-transform: uppercase; font-size: 10px; letter-spacing: .13em; color: #aeb3bb; padding: 0 12px; margin-bottom: 7px; }
+    .nav-item { display: flex; align-items: center; gap: 11px; width: 100%; text-align: left; border: 0; color: #d8dbe0; background: transparent; padding: 12px; border-radius: 10px; font-weight: 650; margin: 3px 0; }
+    .nav-item.active, .nav-item:hover { background: #3b3e44; color: #fff; }
+    .nav-item.active { box-shadow: inset 3px 0 var(--red); }
+    .aside-bottom { margin-top: auto; border-top: 1px solid #44474d; padding-top: 17px; }
+    main { min-width: 0; }
+    .topbar { min-height: 76px; background: #fff; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; padding: 16px 30px; gap: 16px; }
+    .topbar-title { font-weight: 800; font-size: 18px; }
+    .user-chip { display: flex; align-items: center; gap: 10px; }
+    .avatar { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; color: #fff; background: var(--red); font-weight: 800; }
+    .content { padding: 28px; max-width: 1440px; margin: 0 auto; }
+    .page-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 24px; }
+    .page-head h1 { margin: 0 0 7px; }
+    .eyebrow { color: var(--red); font-size: 11px; font-weight: 850; text-transform: uppercase; letter-spacing: .13em; margin-bottom: 7px; }
+    .stats { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 16px; margin-bottom: 22px; }
+    .stat, .panel { background: #fff; border: 1px solid var(--line); border-radius: 15px; box-shadow: 0 4px 16px rgba(26,31,38,.025); }
+    .stat { padding: 19px; }
+    .stat-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; color: var(--muted); font-size: 13px; font-weight: 700; }
+    .stat-icon { width: 36px; height: 36px; border-radius: 10px; background: #fff0f1; color: var(--red); display: grid; place-items: center; font-size: 18px; }
+    .stat-value { font-size: clamp(23px, 2.4vw, 31px); font-weight: 850; letter-spacing: -.04em; margin-top: 13px; }
+    .stat-note { font-size: 12px; color: var(--muted); margin-top: 5px; }
+    .grid-main { display: grid; grid-template-columns: minmax(0,1.3fr) minmax(280px,.7fr); gap: 18px; align-items: start; }
+    .panel { padding: 22px; }
+    .panel-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
+    .panel-head h2 { font-size: 16px; margin: 0; }
+    .form-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 0 15px; }
+    .span-2 { grid-column: span 2; }
+    .form-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 8px; }
+    .helper { color: var(--muted); font-size: 12px; margin-top: 5px; }
+    .table-wrap { overflow-x: auto; }
+    table { border-collapse: collapse; width: 100%; min-width: 640px; }
+    th, td { text-align: left; padding: 12px 10px; border-bottom: 1px solid #eceef1; font-size: 13px; }
+    th { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .07em; }
+    .pill { display: inline-flex; align-items: center; border-radius: 999px; background: #f0f1f3; padding: 5px 9px; font-size: 11px; font-weight: 750; }
+    .pill-red { color: #a91e27; background: #fff0f1; }
+    .empty { padding: 28px 12px; text-align: center; color: var(--muted); }
+    .notice { background: #fff7e8; border: 1px solid #f1d8a8; color: #79551b; border-radius: 11px; padding: 12px 14px; font-size: 13px; margin-bottom: 20px; }
+    .type-options { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+    .choice { border: 1px solid #d9dde2; background: #fff; color: var(--text); padding: 11px 8px; border-radius: 10px; font-weight: 700; }
+    .choice.selected { border-color: var(--red); background: #fff0f1; color: #b91f28; box-shadow: inset 0 0 0 1px var(--red); }
+    .swatches { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+    .swatch { display: flex; align-items: center; gap: 7px; justify-content: center; }
+    .dot { width: 13px; height: 13px; border-radius: 50%; border: 1px solid #bfc4cb; display: inline-block; }
+    .footer-note { color: var(--muted); font-size: 11px; margin-top: 18px; }
+    @media (max-width: 950px) { .app { grid-template-columns: 1fr; } aside { padding: 14px 16px; gap: 12px; } aside .nav-label, aside .aside-bottom { display: none; } .nav-list { display: flex; gap: 5px; overflow-x: auto; } .nav-item { width: auto; white-space: nowrap; } .grid-main { grid-template-columns: 1fr; } }
+    @media (max-width: 650px) { .content { padding: 18px 13px; } .topbar { padding: 14px; } .topbar-title { font-size: 15px; } .user-meta { display: none; } .stats { grid-template-columns: 1fr; gap: 10px; } .stat { padding: 15px; } .form-grid { grid-template-columns: 1fr; } .span-2 { grid-column: span 1; } .panel { padding: 16px; } .auth-card { padding: 23px; } .page-head { flex-direction: column; } }
+  </style>
+</head>
+<body>
+  <section id="authView" class="auth-wrap">
+    <div class="auth-card">
+      <div class="brand">
+        <div class="brand-mark">F</div>
+        <div><div class="brand-title">APONTAMENTO DE REFUGOS</div><div class="brand-sub">FORTUCE</div></div>
+      </div>
+      <h1 id="authTitle">Acesse sua conta</h1>
+      <p class="muted" id="authSubtitle">Entre com seu login individual para continuar.</p>
+      <form id="loginForm">
+        <div id="nameFields" class="hidden">
+          <div class="field"><label for="firstName">Nome</label><input id="firstName" autocomplete="given-name" /></div>
+          <div class="field"><label for="lastName">Sobrenome</label><input id="lastName" autocomplete="family-name" /></div>
+        </div>
+        <div class="field"><label for="email">E-mail corporativo</label><input id="email" type="email" required autocomplete="username" placeholder="nome@empresa.com" /></div>
+        <div class="field"><label for="password">Senha</label><input id="password" type="password" required minlength="6" autocomplete="current-password" placeholder="Mínimo de 6 caracteres" /></div>
+        <button class="btn btn-primary full" id="authSubmit" type="submit">Entrar</button>
+        <div id="authError" class="error hidden" role="alert"></div>
+      </form>
+      <div style="margin-top:15px;text-align:center"><button class="btn-link" id="toggleAuth" type="button">Primeiro acesso? Criar cadastro</button></div>
+      <p class="footer-note">Acesso individual. Não compartilhe sua senha.</p>
+    </div>
+  </section>
+
+  <section id="appView" class="app hidden">
+    <aside>
+      <div class="brand"><div class="brand-mark">F</div><div><div class="brand-title">APONTAMENTO DE REFUGOS</div><div class="brand-sub">FORTUCE</div></div></div>
+      <div>
+        <div class="nav-label">Menu principal</div>
+        <div class="nav-list">
+          <button class="nav-item active" data-page="dashboard">▦ &nbsp; Painel</button>
+          <button class="nav-item" data-page="new">＋ &nbsp; Novo apontamento</button>
+          <button class="nav-item" data-page="history">☷ &nbsp; Histórico</button>
+        </div>
+      </div>
+      <div class="aside-bottom"><div class="small" style="color:#b8bdc5">SISTEMA DE PRODUÇÃO</div><div class="small" style="color:#fff;margin-top:5px">Setor de Sopro PET</div></div>
+    </aside>
+    <main>
+      <header class="topbar">
+        <div><div class="topbar-title" id="topTitle">Painel de indicadores</div><div class="muted small">Acompanhamento de perdas de produção</div></div>
+        <div class="user-chip"><div class="avatar" id="userAvatar">U</div><div class="user-meta"><div id="userName" style="font-weight:800;font-size:13px">Usuário</div><div id="userRole" class="muted small">Operador</div></div><button class="btn btn-secondary" id="logoutBtn">Sair</button></div>
+      </header>
+      <div class="content">
+        <div class="notice" id="setupNotice">Configuração necessária: adicione as credenciais do seu projeto Firebase no arquivo <strong>index.html</strong> para ativar login e salvamento online. Consulte o README.</div>
+        <section id="dashboardPage">
+          <div class="page-head"><div><div class="eyebrow">Visão geral</div><h1>Painel de perdas</h1><div class="muted">Indicadores calculados a partir dos apontamentos registrados.</div></div><button class="btn btn-primary" data-goto="new">＋ Novo apontamento</button></div>
+          <div class="stats">
+            <article class="stat"><div class="stat-top"><span>Peso total refugado</span><span class="stat-icon">↘</span></div><div class="stat-value" id="totalKg">0,00 kg</div><div class="stat-note">Soma dos registros disponíveis</div></article>
+            <article class="stat"><div class="stat-top"><span>Peças estimadas</span><span class="stat-icon">▦</span></div><div class="stat-value" id="totalPieces">0</div><div class="stat-note">Estimativa baseada na gramatura</div></article>
+            <article class="stat"><div class="stat-top"><span>Custo estimado</span><span class="stat-icon">R$</span></div><div class="stat-value" id="totalCost">R$ 0,00</div><div class="stat-note">Depende do custo/kg configurado</div></article>
+          </div>
+          <div class="grid-main">
+            <div class="panel"><div class="panel-head"><h2>Apontamentos recentes</h2><button class="btn btn-secondary" data-goto="history">Ver histórico</button></div><div id="recentTable"></div></div>
+            <div class="panel"><div class="panel-head"><h2>Refugo por tipo</h2></div><div id="typeSummary" class="empty">Ainda não há apontamentos registrados.</div></div>
+          </div>
+        </section>
+
+        <section id="newPage" class="hidden">
+          <div class="page-head"><div><div class="eyebrow">Registro operacional</div><h1>Novo apontamento</h1><div class="muted">Informe os dados do refugo. Seu usuário será identificado automaticamente.</div></div></div>
+          <div class="panel">
+            <form id="scrapForm">
+              <div class="form-grid">
+                <div class="field"><label for="scrapDate">Data do refugo *</label><input id="scrapDate" type="date" required /></div>
+                <div class="field"><label for="machine">Máquina *</label><select id="machine" required><option value="">Selecione a máquina</option><option>Máquina 01</option><option>Máquina 02</option><option>Máquina 03</option></select><div class="helper">Lista provisória, personalizar com as máquinas reais.</div></div>
+                <div class="field span-2"><label>Tipo de perda *</label><div class="type-options" id="typeOptions"><button type="button" class="choice selected" data-value="Garrafa">Garrafa</button><button type="button" class="choice" data-value="Pré-forma">Pré-forma</button><button type="button" class="choice" data-value="Varredura">Varredura</button></div><input id="lossType" type="hidden" value="Garrafa" /></div>
+                <div class="field span-2"><label>Cor da perda *</label><div class="type-options" id="colorOptions"><button type="button" class="choice selected" data-value="Leitosa"><span class="swatch"><i class="dot" style="background:#e6e4dd"></i>Leitosa</span></button><button type="button" class="choice" data-value="Transparente"><span class="swatch"><i class="dot" style="background:#fff"></i>Transparente</span></button><button type="button" class="choice" data-value="Translúcida"><span class="swatch"><i class="dot" style="background:#b8d8e8"></i>Translúcida</span></button></div><input id="lossColor" type="hidden" value="Leitosa" /></div>
+                <div class="field"><label for="grammage">Gramatura *</label><select id="grammage" required><option value="18">18 g</option><option value="26">26 g</option><option value="28">28 g</option><option value="33">33 g</option></select><div class="helper">Usada para estimar a quantidade de peças.</div></div>
+                <div class="field"><label for="supplier">Fornecedor da pré-forma *</label><select id="supplier" required><option selected>Fortpet</option><option>Outro fornecedor cadastrado</option></select><div class="helper">Fortpet é o padrão inicial.</div></div>
+                <div class="field"><label for="weightKg">Peso do refugo (kg) *</label><input id="weightKg" type="number" min="0.001" step="0.001" required placeholder="Ex.: 2,500" /><div class="helper">Necessário para calcular peças estimadas e custo.</div></div>
+                <div class="field"><label for="costKg">Custo por kg (R$)</label><input id="costKg" type="number" min="0" step="0.01" placeholder="Será configurado pela administração" disabled /><div class="helper">Não é informado pelo operador; virá dos parâmetros do sistema.</div></div>
+                <div class="field span-2"><label for="notes">Observações (opcional)</label><textarea id="notes" maxlength="1000" placeholder="Descreva detalhes relevantes sobre o refugo..."></textarea></div>
+              </div>
+              <div class="notice">A quantidade de peças e o valor financeiro são calculados pelo sistema e não precisam ser digitados pelo operador.</div>
+              <div class="form-actions"><button type="reset" class="btn btn-secondary" id="clearForm">Limpar</button><button type="submit" class="btn btn-primary">Registrar refugo</button></div>
+              <div id="formMessage" class="error hidden" role="alert"></div>
+            </form>
+          </div>
+        </section>
+
+        <section id="historyPage" class="hidden">
+          <div class="page-head"><div><div class="eyebrow">Consulta</div><h1>Histórico de apontamentos</h1><div class="muted">Consulte os registros disponíveis para o seu perfil.</div></div><button class="btn btn-primary" data-goto="new">＋ Novo apontamento</button></div>
+          <div class="panel"><div class="table-wrap" id="historyTable"></div></div>
+        </section>
+        <p class="footer-note">Apontamento de Refugos Fortuce • Protótipo inicial de desenvolvimento</p>
+      </div>
+    </main>
+  </section>
+
+  <script type="module">
+    // 1) Substitua os valores abaixo pelas credenciais do seu projeto Firebase.
+    const firebaseConfig = {
+      apiKey: "AIzaSyBEp8-ztvtGVTeHfR_vq5EG_3_S4h0336Y",
+      authDomain: "apontamento-refugos-fortuce.firebaseapp.com",
+      projectId: "apontamento-refugos-fortuce",
+      storageBucket: "apontamento-refugos-fortuce.firebasestorage.app",
+      messagingSenderId: "435895323544",
+      appId: "1:435895323544:web:fe86ce8383aee92a7ef9ed"
+    };
+    const firebaseConfigured = true;
+
+    let auth, db, currentUser = null, currentProfile = null, records = [], signupMode = false;
+    const $ = id => document.getElementById(id);
+    const brl = n => new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(n || 0);
+    const num = n => new Intl.NumberFormat('pt-BR',{maximumFractionDigits:2}).format(n || 0);
+    const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    const today = new Date(); $('scrapDate').value = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+
+    function showError(message) { $('authError').textContent = message; $('authError').classList.remove('hidden'); }
+    function clearError() { $('authError').classList.add('hidden'); $('authError').textContent = ''; }
+    function setAuthMode(signup) {
+      signupMode = signup; clearError();
+      $('authTitle').textContent = signup ? 'Criar seu acesso' : 'Acesse sua conta';
+      $('authSubtitle').textContent = signup ? 'Cadastre seu nome e sobrenome uma única vez.' : 'Entre com seu login individual para continuar.';
+      $('nameFields').classList.toggle('hidden', !signup);
+      $('firstName').required = signup; $('lastName').required = signup;
+      $('authSubmit').textContent = signup ? 'Criar cadastro' : 'Entrar';
+      $('toggleAuth').textContent = signup ? 'Já tenho cadastro. Entrar' : 'Primeiro acesso? Criar cadastro';
+    }
+    $('toggleAuth').addEventListener('click', () => setAuthMode(!signupMode));
+
+    function initFirebaseNotice() {
+      $('setupNotice').classList.toggle('hidden', firebaseConfigured);
+    }
+    initFirebaseNotice();
+
+    $('loginForm').addEventListener('submit', async e => {
+      e.preventDefault(); clearError();
+      if (!firebaseConfigured) { showError('O Firebase ainda não foi configurado. Siga o README do projeto para conectar autenticação e banco de dados.'); return; }
+      try {
+        const email = $('email').value.trim(), password = $('password').value;
+        if (signupMode) {
+          const firstName = $('firstName').value.trim(), lastName = $('lastName').value.trim();
+          if (!firstName || !lastName) throw new Error('Informe nome e sobrenome.');
+          const cred = await createUserWithEmailAndPassword(auth, email, password);
+          await setDoc(doc(db, 'users', cred.user.uid), {
+            firstName, lastName, fullName: `${firstName} ${lastName}`, email,
+            role: 'operador', active: true, createdAt: serverTimestamp()
+          });
+        } else {
+          await signInWithEmailAndPassword(auth, email, password);
+        }
+      } catch (err) { showError(firebaseMessage(err)); }
+    });
+
+    function firebaseMessage(err) {
+      const map = {
+        'auth/invalid-credential':'E-mail ou senha incorretos.',
+        'auth/email-already-in-use':'Este e-mail já possui cadastro.',
+        'auth/weak-password':'A senha precisa ter pelo menos 6 caracteres.',
+        'auth/invalid-email':'Informe um e-mail válido.',
+        'auth/too-many-requests':'Muitas tentativas. Aguarde e tente novamente.',
+        'permission-denied':'Acesso negado pelas regras de segurança do banco.'
+      };
+      return map[err.code] || err.message || 'Não foi possível concluir a operação.';
+    }
+
+    function switchPage(page) {
+      ['dashboard','new','history'].forEach(p => $(p+'Page').classList.toggle('hidden', p !== page));
+      document.querySelectorAll('[data-page]').forEach(b => b.classList.toggle('active', b.dataset.page === page));
+      $('topTitle').textContent = ({dashboard:'Painel de indicadores',new:'Novo apontamento',history:'Histórico de apontamentos'})[page];
+      if (page === 'history') renderHistory();
+    }
+    document.querySelectorAll('[data-page]').forEach(b => b.addEventListener('click', () => switchPage(b.dataset.page)));
+    document.querySelectorAll('[data-goto]').forEach(b => b.addEventListener('click', () => switchPage(b.dataset.goto)));
+
+    function selectButtons(containerId, inputId) {
+      $(containerId).querySelectorAll('.choice').forEach(btn => btn.addEventListener('click', () => {
+        $(containerId).querySelectorAll('.choice').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected'); $(inputId).value = btn.dataset.value;
+      }));
+    }
+    selectButtons('typeOptions','lossType'); selectButtons('colorOptions','lossColor');
+
+    function canSeeAll() { return ['lideranca','administrador'].includes(currentProfile?.role); }
+    function canCreate() { return ['operador','administrador'].includes(currentProfile?.role); }
+    function canEdit() { return ['operador','administrador'].includes(currentProfile?.role); }
+    function updateRoleUI() {
+      document.querySelectorAll('[data-page="new"], [data-goto="new"]').forEach(b => b.classList.toggle('hidden', !canCreate()));
+      $('userName').textContent = currentProfile?.fullName || currentUser?.email || 'Usuário';
+      $('userRole').textContent = ({operador:'Operador',lideranca:'Liderança',administrador:'Administrador'})[currentProfile?.role] || 'Operador';
+      $('userAvatar').textContent = (currentProfile?.firstName || currentUser?.email || 'U').slice(0,1).toUpperCase();
+    }
+
+    $('scrapForm').addEventListener('submit', async e => {
+      e.preventDefault(); $('formMessage').classList.add('hidden');
+      if (!currentUser || !db) { formError('Entre com uma conta conectada ao Firebase para registrar dados.'); return; }
+      if (!canCreate()) { formError('Seu perfil não tem permissão para registrar perdas.'); return; }
+      const weightKg = Number($('weightKg').value);
+      if (!(weightKg > 0)) { formError('Informe um peso de refugo maior que zero.'); return; }
+      const lossType = $('lossType').value;
+      const gram = Number($('grammage').value);
+      const estimatedPieces = lossType === 'Varredura' ? null : Math.round(weightKg * 1000 / gram);
+      const record = {
+        scrapDate: $('scrapDate').value, machine: $('machine').value,
+        lossType, color: $('lossColor').value, grammage: gram,
+        supplier: $('supplier').value, weightKg,
+        estimatedPieces, costKg: null, estimatedCost: null,
+        notes: $('notes').value.trim(), userId: currentUser.uid,
+        operatorName: currentProfile?.fullName || currentUser.email,
+        createdAt: serverTimestamp(), updatedAt: serverTimestamp()
+      };
+      try {
+        await addDoc(collection(db, 'scrapRecords'), record);
+        $('scrapForm').reset(); $('scrapDate').value = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+        $('grammage').value = '18'; $('supplier').value = 'Fortpet';
+        $('formMessage').className = 'notice'; $('formMessage').textContent = 'Refugo registrado com sucesso.';
+        await loadRecords(); switchPage('dashboard');
+      } catch (err) { formError(firebaseMessage(err)); }
+    });
+    function formError(msg) { $('formMessage').className = 'error'; $('formMessage').textContent = msg; $('formMessage').classList.remove('hidden'); }
+
+    async function loadRecords() {
+      if (!currentUser || !db) return;
+      try {
+        let q;
+        if (canSeeAll()) q = query(collection(db,'scrapRecords'), orderBy('createdAt','desc'), limit(200));
+        else q = query(collection(db,'scrapRecords'), where('userId','==',currentUser.uid), orderBy('createdAt','desc'), limit(200));
+        const snap = await getDocs(q);
+        records = snap.docs.map(d => ({id:d.id,...d.data()}));
+        renderDashboard(); renderHistory();
+      } catch (err) { console.error(err); records = []; renderDashboard(); renderHistory(); }
+    }
+
+    function renderDashboard() {
+      const kg = records.reduce((s,r)=>s+(Number(r.weightKg)||0),0);
+      const pieces = records.reduce((s,r)=>s+(Number(r.estimatedPieces)||0),0);
+      const cost = records.reduce((s,r)=>s+(Number(r.estimatedCost)||0),0);
+      $('totalKg').textContent = `${num(kg)} kg`;
+      $('totalPieces').textContent = num(pieces);
+      $('totalCost').textContent = brl(cost);
+      $('recentTable').innerHTML = tableHTML(records.slice(0,5));
+      const types = ['Garrafa','Pré-forma','Varredura'];
+      const total = kg || 1;
+      $('typeSummary').innerHTML = records.length ? types.map(t => {
+        const v = records.filter(r=>r.lossType===t).reduce((s,r)=>s+(Number(r.weightKg)||0),0);
+        return `<div style="margin:16px 0"><div style="display:flex;justify-content:space-between;gap:12px;font-size:13px;font-weight:700;margin-bottom:7px"><span>${t}</span><span>${num(v)} kg</span></div><div style="height:8px;background:#eceef1;border-radius:99px;overflow:hidden"><div style="height:100%;width:${Math.min(100,v/total*100)}%;background:var(--red);border-radius:99px"></div></div></div>`;
+      }).join('') : 'Ainda não há apontamentos registrados.';
+    }
+    function tableHTML(list) {
+      if (!list.length) return '<div class="empty">Nenhum apontamento para exibir.</div>';
+      return `<div class="table-wrap"><table><thead><tr><th>Data</th><th>Máquina</th><th>Tipo</th><th>Cor</th><th>Peso</th><th>Operador</th></tr></thead><tbody>${list.map(r=>`<tr><td>${esc(r.scrapDate||'')}</td><td>${esc(r.machine||'')}</td><td><span class="pill pill-red">${esc(r.lossType||'')}</span></td><td>${esc(r.color||'')}</td><td>${num(Number(r.weightKg)||0)} kg</td><td>${esc(r.operatorName||'')}</td></tr>`).join('')}</tbody></table></div>`;
+    }
+    function renderHistory() { $('historyTable').innerHTML = tableHTML(records); }
+
+    $('logoutBtn').addEventListener('click', async () => { if (auth) await signOut(auth); });
+    function enterApp(user, profile) {
+      currentUser = user; currentProfile = profile || {role:'operador',fullName:user.email,firstName:user.email};
+      $('authView').classList.add('hidden'); $('appView').classList.remove('hidden');
+      updateRoleUI(); loadRecords();
+    }
+    function exitApp() {
+      currentUser = null; currentProfile = null; records = [];
+      $('appView').classList.add('hidden'); $('authView').classList.remove('hidden');
+    }
+
+    if (firebaseConfigured) {
+      const appModule = await import('https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js');
+      const authModule = await import('https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js');
+      const dbModule = await import('https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js');
+      const analyticsModule = await import('https://www.gstatic.com/firebasejs/13.1.0/firebase-analytics.js');
+      const { initializeApp } = appModule;
+      const { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } = authModule;
+      const { getFirestore, doc, setDoc, serverTimestamp, collection, addDoc, query, where, orderBy, limit, getDocs } = dbModule;
+      window._firebase = { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, doc, setDoc, serverTimestamp, collection, addDoc, query, where, orderBy, limit, getDocs };
+      const app = initializeApp(firebaseConfig);
+      auth = getAuth(app);
+      db = getFirestore(app);
+      // Analytics é opcional e só é inicializado em ambientes compatíveis.
+      try {
+        if (await analyticsModule.isSupported()) analyticsModule.getAnalytics(app);
+      } catch (analyticsError) {
+        console.info('Firebase Analytics não está disponível neste ambiente.', analyticsError);
+      }
+      onAuthStateChanged(auth, async user => {
+        if (!user) { exitApp(); return; }
+        try {
+          const { getDoc, doc } = dbModule;
+          const profileSnap = await getDoc(doc(db,'users',user.uid));
+          if (!profileSnap.exists()) { await signOut(auth); showError('Perfil de usuário não encontrado. Entre em contato com o administrador.'); return; }
+          const profile = profileSnap.data();
+          if (profile.active === false) { await signOut(auth); showError('Seu acesso está desativado. Procure a liderança.'); return; }
+          enterApp(user, profile);
+        } catch (err) { console.error(err); showError('Não foi possível carregar seu perfil: '+firebaseMessage(err)); }
+      });
+      // Expose module functions used by the handlers without putting secrets in client code.
+      Object.assign(window, { });
+      // Local aliases used by module-scoped handlers.
+      globalThis.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
+      globalThis.signInWithEmailAndPassword = signInWithEmailAndPassword;
+      globalThis.setDoc = setDoc; globalThis.doc = doc; globalThis.serverTimestamp = serverTimestamp;
+      globalThis.addDoc = addDoc; globalThis.collection = collection; globalThis.query = query;
+      globalThis.where = where; globalThis.orderBy = orderBy; globalThis.limit = limit; globalThis.getDocs = getDocs;
+      globalThis.signOut = signOut;
+    }
+  </script>
+</body>
+</html>
