@@ -13,9 +13,28 @@
       --green: #18794e; --shadow: 0 12px 30px rgba(26, 31, 38, .08);
     }
     * { box-sizing: border-box; }
+    :root.dark-mode { --bg:#17191d; --white:#22252a; --text:#f1f3f5; --muted:#b0b6bf; --line:#3a3e45; --gray:#b0b6bf; --shadow:0 12px 30px rgba(0,0,0,.25); }
+    body.dark-mode { background:var(--bg); color:var(--text); }
+    body.dark-mode .topbar, body.dark-mode .panel, body.dark-mode .stat, body.dark-mode .auth-card { background:var(--white); color:var(--text); border-color:var(--line); }
+    body.dark-mode input, body.dark-mode select, body.dark-mode textarea { background:#2c3036; color:var(--text); border-color:#4a5059; }
+    body.dark-mode .btn-secondary { background:#383d44; color:#f4f5f7; }
+    body.dark-mode th, body.dark-mode td { border-color:#3a3e45; }
+    body.dark-mode .choice { background:#2c3036; color:var(--text); border-color:#4a5059; }
+    body.dark-mode .choice.selected { background:#4a2529; color:#fff; }
+    button, input, select { min-height:48px; }
+    .btn-sm { min-height:40px; }
+    .nav-item { min-height:48px; }
+    .success-toast { position:fixed; right:18px; bottom:18px; z-index:1000; background:#18794e; color:#fff; border-radius:12px; padding:14px 18px; box-shadow:var(--shadow); }
+    .filter-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; align-items:end; }
+    .catalog-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; }
+    .catalog-card { border:1px solid var(--line); border-radius:12px; padding:14px; }
+    .pareto-wrap { min-height:260px; }
+    @media(max-width:800px) { .filter-grid,.catalog-grid { grid-template-columns:1fr 1fr; } }
+    @media(max-width:520px) { .filter-grid,.catalog-grid { grid-template-columns:1fr; } }
     body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.45 Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
     button, input, select, textarea { font: inherit; }
     button { cursor: pointer; }
+    button:disabled { opacity: .65; cursor: wait; }
     .hidden { display: none !important; }
     .auth-wrap { min-height: 100vh; display: grid; place-items: center; padding: 24px; background: radial-gradient(circle at top right, #f8dfe1 0, transparent 34%), var(--bg); }
     .auth-card { width: min(100%, 440px); background: var(--white); border: 1px solid var(--line); border-radius: 20px; padding: 30px; box-shadow: var(--shadow); }
@@ -86,6 +105,7 @@
     .swatch { display: flex; align-items: center; gap: 7px; justify-content: center; }
     .dot { width: 13px; height: 13px; border-radius: 50%; border: 1px solid #bfc4cb; display: inline-block; }
     .footer-note { color: var(--muted); font-size: 11px; margin-top: 18px; }
+    .admin-actions { display:flex; gap:8px; flex-wrap:wrap; } .btn-sm { padding:7px 10px; font-size:12px; } .status-active { color:#18794e; background:#e8f6ef; } .status-inactive { color:#a91e27; background:#fff0f1; } .inline-field { display:flex; gap:10px; align-items:end; flex-wrap:wrap; } .inline-field .field { flex:1; min-width:180px; }
     @media (max-width: 950px) { .app { grid-template-columns: 1fr; } aside { padding: 14px 16px; gap: 12px; } aside .nav-label, aside .aside-bottom { display: none; } .nav-list { display: flex; gap: 5px; overflow-x: auto; } .nav-item { width: auto; white-space: nowrap; } .grid-main { grid-template-columns: 1fr; } }
     @media (max-width: 650px) { .content { padding: 18px 13px; } .topbar { padding: 14px; } .topbar-title { font-size: 15px; } .user-meta { display: none; } .stats { grid-template-columns: 1fr; gap: 10px; } .stat { padding: 15px; } .form-grid { grid-template-columns: 1fr; } .span-2 { grid-column: span 1; } .panel { padding: 16px; } .auth-card { padding: 23px; } .page-head { flex-direction: column; } }
   </style>
@@ -103,6 +123,8 @@
         <div id="nameFields" class="hidden">
           <div class="field"><label for="firstName">Nome</label><input id="firstName" autocomplete="given-name" /></div>
           <div class="field"><label for="lastName">Sobrenome</label><input id="lastName" autocomplete="family-name" /></div>
+          <div class="field"><label for="employeeId">Matrícula</label><input id="employeeId" maxlength="30" autocomplete="off" /></div>
+          <div class="field"><label for="signupShift">Turno</label><select id="signupShift"><option value="1º turno">1º turno</option><option value="2º turno">2º turno</option><option value="3º turno">3º turno</option><option value="Comercial">Comercial</option></select></div>
         </div>
         <div class="field"><label for="email">E-mail corporativo</label><input id="email" type="email" required autocomplete="username" placeholder="nome@empresa.com" /></div>
         <div class="field"><label for="password">Senha</label><input id="password" type="password" required minlength="6" autocomplete="current-password" placeholder="Mínimo de 6 caracteres" /></div>
@@ -123,6 +145,9 @@
           <button class="nav-item active" data-page="dashboard">▦ &nbsp; Painel</button>
           <button class="nav-item" data-page="new">＋ &nbsp; Novo apontamento</button>
           <button class="nav-item" data-page="history">☷ &nbsp; Histórico</button>
+          <button class="nav-item hidden" data-page="users" id="usersNav">♙ &nbsp; Usuários</button>
+          <button class="nav-item hidden" data-page="settings" id="settingsNav">⚙ &nbsp; Configurações</button>
+          <button class="nav-item hidden" data-page="catalogs" id="catalogsNav">▤ &nbsp; Cadastros mestres</button>
         </div>
       </div>
       <div class="aside-bottom"><div class="small" style="color:#b8bdc5">SISTEMA DE PRODUÇÃO</div><div class="small" style="color:#fff;margin-top:5px">Setor de Sopro PET</div></div>
@@ -130,7 +155,7 @@
     <main>
       <header class="topbar">
         <div><div class="topbar-title" id="topTitle">Painel de indicadores</div><div class="muted small">Acompanhamento de perdas de produção</div></div>
-        <div class="user-chip"><div class="avatar" id="userAvatar">U</div><div class="user-meta"><div id="userName" style="font-weight:800;font-size:13px">Usuário</div><div id="userRole" class="muted small">Operador</div></div><button class="btn btn-secondary" id="logoutBtn">Sair</button></div>
+        <div class="user-chip"><div class="avatar" id="userAvatar">U</div><div class="user-meta"><div id="userName" style="font-weight:800;font-size:13px">Usuário</div><div id="userRole" class="muted small">Operador</div></div><button class="btn btn-secondary" id="darkModeBtn" type="button" aria-label="Alternar modo escuro">☾</button><button class="btn btn-secondary" id="logoutBtn">Sair</button></div>
       </header>
       <div class="content">
         <div class="notice" id="setupNotice">Configuração necessária: adicione as credenciais do seu projeto Firebase no arquivo <strong>index.html</strong> para ativar login e salvamento online. Consulte o README.</div>
@@ -144,6 +169,7 @@
           <div class="grid-main">
             <div class="panel"><div class="panel-head"><h2>Apontamentos recentes</h2><button class="btn btn-secondary" data-goto="history">Ver histórico</button></div><div id="recentTable"></div></div>
             <div class="panel"><div class="panel-head"><h2>Refugo por tipo</h2></div><div id="typeSummary" class="empty">Ainda não há apontamentos registrados.</div></div>
+            <div class="panel span-2"><div class="panel-head"><h2>Pareto de motivos de refugo</h2><span class="muted small">Frequência e percentual acumulado</span></div><div class="pareto-wrap"><canvas id="paretoChart" aria-label="Gráfico de Pareto de motivos de refugo"></canvas><div id="paretoFallback" class="empty hidden"></div></div></div>
           </div>
         </section>
 
@@ -153,16 +179,20 @@
             <form id="scrapForm">
               <div class="form-grid">
                 <div class="field"><label for="scrapDate">Data do refugo *</label><input id="scrapDate" type="date" required /></div>
-                <div class="field"><label for="machine">Máquina *</label><select id="machine" required><option value="">Selecione a máquina</option><option>Máquina 01</option><option>Máquina 02</option><option>Máquina 03</option></select><div class="helper">Lista provisória, personalizar com as máquinas reais.</div></div>
+                <div class="field"><label for="machine">Linha / máquina *</label><select id="machine" required><option value="">Selecione a linha</option><option>Máquina 01</option><option>Máquina 02</option><option>Máquina 03</option></select></div>
+                <div class="field"><label for="shift">Turno *</label><select id="shift" required><option value="1º turno">1º turno</option><option value="2º turno">2º turno</option><option value="3º turno">3º turno</option><option value="Comercial">Comercial</option></select></div>
+                <div class="field"><label for="productSku">Produto / molde</label><select id="productSku"><option value="">Selecione (opcional)</option></select></div>
+                <div class="field"><label for="defectReason">Motivo do refugo *</label><select id="defectReason" required><option value="">Selecione o motivo</option><option>Rebarba</option><option>Bolha</option><option>Deformação</option><option>Variação de peso</option><option>Contaminação</option><option>Cor fora do padrão</option><option>Falha de sopro</option><option>Outro</option></select></div>
                 <div class="field span-2"><label>Tipo de perda *</label><div class="type-options" id="typeOptions"><button type="button" class="choice selected" data-value="Garrafa">Garrafa</button><button type="button" class="choice" data-value="Pré-forma">Pré-forma</button><button type="button" class="choice" data-value="Varredura">Varredura</button></div><input id="lossType" type="hidden" value="Garrafa" /></div>
                 <div class="field span-2"><label>Cor da perda *</label><div class="type-options" id="colorOptions"><button type="button" class="choice selected" data-value="Leitosa"><span class="swatch"><i class="dot" style="background:#e6e4dd"></i>Leitosa</span></button><button type="button" class="choice" data-value="Transparente"><span class="swatch"><i class="dot" style="background:#fff"></i>Transparente</span></button><button type="button" class="choice" data-value="Translúcida"><span class="swatch"><i class="dot" style="background:#b8d8e8"></i>Translúcida</span></button></div><input id="lossColor" type="hidden" value="Leitosa" /></div>
                 <div class="field"><label for="grammage">Gramatura *</label><select id="grammage" required><option value="18">18 g</option><option value="26">26 g</option><option value="28">28 g</option><option value="33">33 g</option></select><div class="helper">Usada para estimar a quantidade de peças.</div></div>
                 <div class="field"><label for="supplier">Fornecedor da pré-forma *</label><select id="supplier" required><option selected>Fortpet</option><option>Outro fornecedor cadastrado</option></select><div class="helper">Fortpet é o padrão inicial.</div></div>
-                <div class="field"><label for="weightKg">Peso do refugo (kg) *</label><input id="weightKg" type="number" min="0.001" step="0.001" required placeholder="Ex.: 2,500" /><div class="helper">Necessário para calcular peças estimadas e custo.</div></div>
-                <div class="field"><label for="costKg">Custo por kg (R$)</label><input id="costKg" type="number" min="0" step="0.01" placeholder="Será configurado pela administração" disabled /><div class="helper">Não é informado pelo operador; virá dos parâmetros do sistema.</div></div>
+                <div class="field"><label for="weightKg">Peso do refugo (kg) *</label><input id="weightKg" type="text" inputmode="decimal" pattern="[0-9]+([,.][0-9]{1,3})?" required placeholder="Ex.: 2,500" /><div class="helper">Aceita vírgula ou ponto decimal.</div></div>
+                <div class="field"><label for="observedPieces">Peças contadas (opcional)</label><input id="observedPieces" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="Quantidade contada" /><div class="helper">Se informar, o sistema compara com a estimativa por gramatura.</div></div>
+                <div class="field"><label for="costKg">Custo por kg (R$)</label><input id="costKg" type="number" min="0" step="0.01" placeholder="Será configurado pela administração" readonly /><div class="helper">Não é informado pelo operador; virá dos parâmetros do sistema.</div></div>
                 <div class="field span-2"><label for="notes">Observações (opcional)</label><textarea id="notes" maxlength="1000" placeholder="Descreva detalhes relevantes sobre o refugo..."></textarea></div>
               </div>
-              <div class="notice">A quantidade de peças e o valor financeiro são calculados pelo sistema e não precisam ser digitados pelo operador.</div>
+              <div class="notice">A quantidade estimada e o custo são calculados automaticamente. Se a quantidade contada divergir muito da estimativa, o sistema pedirá confirmação.</div>
               <div class="form-actions"><button type="reset" class="btn btn-secondary" id="clearForm">Limpar</button><button type="submit" class="btn btn-primary">Registrar refugo</button></div>
               <div id="formMessage" class="error hidden" role="alert"></div>
             </form>
@@ -171,13 +201,35 @@
 
         <section id="historyPage" class="hidden">
           <div class="page-head"><div><div class="eyebrow">Consulta</div><h1>Histórico de apontamentos</h1><div class="muted">Consulte os registros disponíveis para o seu perfil.</div></div><button class="btn btn-primary" data-goto="new">＋ Novo apontamento</button></div>
-          <div class="panel"><div class="table-wrap" id="historyTable"></div></div>
+          <div class="panel"><div class="filter-grid">
+            <div class="field"><label for="filterShift">Turno</label><select id="filterShift"><option value="">Todos</option><option>1º turno</option><option>2º turno</option><option>3º turno</option><option>Comercial</option></select></div>
+            <div class="field"><label for="filterMachine">Linha / máquina</label><select id="filterMachine"><option value="">Todas</option></select></div>
+            <div class="field"><label for="filterFrom">Data inicial</label><input id="filterFrom" type="date" /></div>
+            <div class="field"><label for="filterTo">Data final</label><input id="filterTo" type="date" /></div>
+          </div><div class="admin-actions"><button class="btn btn-secondary" id="clearFiltersBtn" type="button">Limpar filtros</button><button class="btn btn-primary" id="exportCsvBtn" type="button">Exportar CSV</button></div><div class="table-wrap" id="historyTable"></div></div>
         </section>
-        <p class="footer-note">Apontamento de Refugos Fortuce • Protótipo inicial de desenvolvimento</p>
+        <section id="usersPage" class="hidden">
+          <div class="page-head"><div><div class="eyebrow">Administração</div><h1>Usuários</h1><div class="muted">Gerencie o acesso e os perfis cadastrados no sistema.</div></div><button class="btn btn-secondary" id="refreshUsersBtn" type="button">Atualizar lista</button></div>
+          <div class="panel"><div id="usersMessage" class="notice hidden"></div><div class="table-wrap" id="usersTable"><div class="empty">Carregando usuários...</div></div></div>
+        </section>
+        <section id="settingsPage" class="hidden">
+          <div class="page-head"><div><div class="eyebrow">Administração</div><h1>Configurações</h1><div class="muted">Parâmetros usados nos cálculos financeiros dos apontamentos.</div></div></div>
+          <div class="panel"><form id="settingsForm"><div class="field"><label for="settingCostKg">Custo do material por kg (R$)</label><input id="settingCostKg" type="number" min="0" step="0.01" required placeholder="Ex.: 8,50" /><div class="helper">O valor será aplicado aos novos apontamentos. Para registros antigos, o custo será atualizado quando forem editados.</div></div><button class="btn btn-primary" type="submit" id="saveSettingsBtn">Salvar configurações</button><div id="settingsMessage" class="notice hidden"></div></form></div>
+        </section>
+        <section id="catalogsPage" class="hidden">
+          <div class="page-head"><div><div class="eyebrow">Gestão mestra</div><h1>Cadastros mestres</h1><div class="muted">Acesso restrito à administração e liderança. Cadastros são gravados no Firestore.</div></div></div>
+          <div class="catalog-grid">
+            <div class="catalog-card"><h2>Produtos / moldes</h2><form id="productForm"><div class="field"><label for="productCode">SKU</label><input id="productCode" required maxlength="40" /></div><div class="field"><label for="productDescription">Descrição</label><input id="productDescription" required maxlength="120" /></div><div class="field"><label for="productGrammage">Gramatura padrão (g)</label><input id="productGrammage" type="number" min="1" step="0.1" required /></div><button class="btn btn-primary full" type="submit">Salvar produto</button></form><div id="productsList" class="small muted"></div></div>
+            <div class="catalog-card"><h2>Motivos de refugo</h2><form id="reasonForm"><div class="field"><label for="reasonName">Motivo padronizado</label><input id="reasonName" required maxlength="80" /></div><button class="btn btn-primary full" type="submit">Adicionar motivo</button></form><div id="reasonsList" class="small muted"></div></div>
+            <div class="catalog-card"><h2>Linhas de produção</h2><form id="lineForm"><div class="field"><label for="lineName">Identificação da linha / máquina</label><input id="lineName" required maxlength="80" /></div><button class="btn btn-primary full" type="submit">Adicionar linha</button></form><div id="linesList" class="small muted"></div></div>
+          </div><div id="catalogsMessage" class="notice hidden" style="margin-top:16px"></div>
+        </section>
+        <p class="footer-note">Apontamento de Refugos Fortuce • Sistema de apontamento de perdas</p>
       </div>
     </main>
   </section>
 
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script type="module">
     // 1) Substitua os valores abaixo pelas credenciais do seu projeto Firebase.
     const firebaseConfig = {
@@ -190,7 +242,13 @@
     };
     const firebaseConfigured = true;
 
-    let auth, db, currentUser = null, currentProfile = null, records = [], signupMode = false, creatingProfile = false;
+    let auth = null, db = null, currentUser = null, currentProfile = null, records = [], signupMode = false, creatingProfile = false;
+    let fb = {};
+    let systemSettings = { costPerKg: 0 };
+    let productsCache = [], reasonsCache = [], linesCache = [], paretoInstance = null;
+    let persistenceReady = false;
+    let usersCache = [];
+    let firebaseInitError = null;
     const $ = id => document.getElementById(id);
     const brl = n => new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(n || 0);
     const num = n => new Intl.NumberFormat('pt-BR',{maximumFractionDigits:2}).format(n || 0);
@@ -204,7 +262,7 @@
       $('authTitle').textContent = signup ? 'Criar seu acesso' : 'Acesse sua conta';
       $('authSubtitle').textContent = signup ? 'Cadastre seu nome e sobrenome uma única vez.' : 'Entre com seu login individual para continuar.';
       $('nameFields').classList.toggle('hidden', !signup);
-      $('firstName').required = signup; $('lastName').required = signup;
+      $('firstName').required = signup; $('lastName').required = signup; $('employeeId').required = signup;
       $('authSubmit').textContent = signup ? 'Criar cadastro' : 'Entrar';
       $('toggleAuth').textContent = signup ? 'Já tenho cadastro. Entrar' : 'Primeiro acesso? Criar cadastro';
     }
@@ -217,37 +275,49 @@
 
     $('loginForm').addEventListener('submit', async e => {
       e.preventDefault(); clearError();
-      if (!firebaseConfigured) { showError('O Firebase ainda não foi configurado. Siga o README do projeto para conectar autenticação e banco de dados.'); return; }
+      if (!firebaseConfigured) { showError('O Firebase ainda não foi configurado. Confira as credenciais no index.html.'); return; }
+      if (!auth || !db || !fb.createUserWithEmailAndPassword) {
+        showError(firebaseInitError ? `Falha ao iniciar o Firebase: ${firebaseMessage(firebaseInitError)}` : 'O Firebase ainda está carregando. Aguarde alguns segundos e tente novamente.');
+        return;
+      }
+      const submitButton = $('authSubmit');
+      submitButton.disabled = true;
+      const originalText = signupMode ? 'Criar cadastro' : 'Entrar';
+      submitButton.textContent = signupMode ? 'Criando cadastro...' : 'Entrando...';
       try {
         const email = $('email').value.trim(), password = $('password').value;
         if (signupMode) {
-          const firstName = $('firstName').value.trim(), lastName = $('lastName').value.trim();
-          if (!firstName || !lastName) throw new Error('Informe nome e sobrenome.');
+          const firstName = $('firstName').value.trim(), lastName = $('lastName').value.trim(), employeeId = $('employeeId').value.trim(), shift = $('signupShift').value;
+          if (!firstName || !lastName || !employeeId) throw new Error('Informe nome e sobrenome.');
           creatingProfile = true;
           let cred = null;
           try {
-            cred = await createUserWithEmailAndPassword(auth, email, password);
+            cred = await fb.createUserWithEmailAndPassword(auth, email, password);
             const profile = {
-              firstName, lastName, fullName: `${firstName} ${lastName}`, email,
-              role: 'operador', active: true, createdAt: serverTimestamp()
+              firstName, lastName, fullName: `${firstName} ${lastName}`, email, employeeId, shift,
+              role: 'operador', active: true, createdAt: fb.serverTimestamp()
             };
-            await setDoc(doc(db, 'users', cred.user.uid), profile);
+            await fb.setDoc(fb.doc(db, 'users', cred.user.uid), profile);
             currentProfile = { ...profile, createdAt: new Date() };
             enterApp(cred.user, currentProfile);
           } catch (signupError) {
-            // Se a autenticação foi criada, mas o perfil falhou, encerra a sessão
-            // para evitar que o listener tente carregar um perfil inexistente.
             if (cred?.user && auth?.currentUser) {
-              try { await signOut(auth); } catch (_) {}
+              try { await fb.signOut(auth); } catch (_) {}
             }
             throw signupError;
           } finally {
             creatingProfile = false;
           }
         } else {
-          await signInWithEmailAndPassword(auth, email, password);
+          await fb.signInWithEmailAndPassword(auth, email, password);
         }
-      } catch (err) { showError(firebaseMessage(err)); }
+      } catch (err) {
+        console.error('Erro de autenticação/cadastro:', err);
+        showError(firebaseMessage(err));
+      } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = originalText;
+      }
     });
 
     function firebaseMessage(err) {
@@ -257,16 +327,29 @@
         'auth/weak-password':'A senha precisa ter pelo menos 6 caracteres.',
         'auth/invalid-email':'Informe um e-mail válido.',
         'auth/too-many-requests':'Muitas tentativas. Aguarde e tente novamente.',
-        'permission-denied':'Acesso negado pelas regras de segurança do banco.'
+        'auth/operation-not-allowed':'O login por e-mail e senha está desativado no Firebase Authentication.',
+        'auth/unauthorized-domain':'Este domínio não está autorizado no Firebase Authentication.',
+        'auth/network-request-failed':'Falha de conexão. Verifique sua internet e tente novamente.',
+        'auth/api-key-not-valid.-please-pass-a-valid-api-key.':'A chave de API do Firebase não foi aceita. Confira a configuração do projeto.',
+        'permission-denied':'Acesso negado pelas regras de segurança do banco.',
+        'firestore/permission-denied':'Acesso negado pelas regras de segurança do Firestore.'
       };
       return map[err.code] || err.message || 'Não foi possível concluir a operação.';
     }
 
     function switchPage(page) {
-      ['dashboard','new','history'].forEach(p => $(p+'Page').classList.toggle('hidden', p !== page));
+      const allowed = ['dashboard','new','history','users','settings','catalogs'];
+      if (!allowed.includes(page)) page = 'dashboard';
+      if (page === 'users' && !['administrador','lideranca'].includes(normalizedRole())) page = 'dashboard';
+      if (page === 'settings' && !isAdmin()) page = 'dashboard';
+      if (page === 'catalogs' && !['administrador','lideranca'].includes(normalizedRole())) page = 'dashboard';
+      allowed.forEach(p => $(p+'Page').classList.toggle('hidden', p !== page));
       document.querySelectorAll('[data-page]').forEach(b => b.classList.toggle('active', b.dataset.page === page));
-      $('topTitle').textContent = ({dashboard:'Painel de indicadores',new:'Novo apontamento',history:'Histórico de apontamentos'})[page];
+      $('topTitle').textContent = ({dashboard:'Painel de indicadores',new:'Novo apontamento',history:'Histórico de apontamentos',users:'Gerenciamento de usuários',settings:'Configurações do sistema',catalogs:'Cadastros mestres'})[page];
       if (page === 'history') renderHistory();
+      if (page === 'users') loadUsers();
+      if (page === 'settings') loadSettings();
+      if (page === 'catalogs') loadCatalogs();
     }
     document.querySelectorAll('[data-page]').forEach(b => b.addEventListener('click', () => switchPage(b.dataset.page)));
     document.querySelectorAll('[data-goto]').forEach(b => b.addEventListener('click', () => switchPage(b.dataset.goto)));
@@ -279,41 +362,66 @@
     }
     selectButtons('typeOptions','lossType'); selectButtons('colorOptions','lossColor');
 
-    function canSeeAll() { return ['lideranca','administrador'].includes(currentProfile?.role); }
-    function canCreate() { return ['operador','administrador'].includes(currentProfile?.role); }
-    function canEdit() { return ['operador','administrador'].includes(currentProfile?.role); }
+    function normalizedRole() { return String(currentProfile?.role || 'operador').trim().toLowerCase(); }
+    function canSeeAll() { return ['lideranca','administrador'].includes(normalizedRole()); }
+    function canCreate() { return ['operador','administrador'].includes(normalizedRole()); }
+    function canEdit() { return ['administrador','lideranca'].includes(normalizedRole()); }
+    function isAdmin() { return normalizedRole() === 'administrador'; }
     function updateRoleUI() {
       document.querySelectorAll('[data-page="new"], [data-goto="new"]').forEach(b => b.classList.toggle('hidden', !canCreate()));
       $('userName').textContent = currentProfile?.fullName || currentUser?.email || 'Usuário';
-      $('userRole').textContent = ({operador:'Operador',lideranca:'Liderança',administrador:'Administrador'})[currentProfile?.role] || 'Operador';
+      $('userRole').textContent = ({operador:'Operador',lideranca:'Liderança',administrador:'Administrador'})[normalizedRole()] || 'Operador';
       $('userAvatar').textContent = (currentProfile?.firstName || currentUser?.email || 'U').slice(0,1).toUpperCase();
+      $('usersNav').classList.toggle('hidden', !['administrador','lideranca'].includes(normalizedRole()));
+      $('settingsNav').classList.toggle('hidden', !isAdmin());
+      $('catalogsNav').classList.toggle('hidden', !['administrador','lideranca'].includes(normalizedRole()));
+      // Evita que uma tela administrativa continue aberta após mudança de perfil.
+      if (!['administrador','lideranca'].includes(normalizedRole()) && $('usersPage') && !$('usersPage').classList.contains('hidden')) switchPage('dashboard');
+      if (!['administrador','lideranca'].includes(normalizedRole()) && $('catalogsPage') && !$('catalogsPage').classList.contains('hidden')) switchPage('dashboard');
+      if (!isAdmin() && $('settingsPage') && !$('settingsPage').classList.contains('hidden')) switchPage('dashboard');
     }
 
     $('scrapForm').addEventListener('submit', async e => {
       e.preventDefault(); $('formMessage').classList.add('hidden');
       if (!currentUser || !db) { formError('Entre com uma conta conectada ao Firebase para registrar dados.'); return; }
       if (!canCreate()) { formError('Seu perfil não tem permissão para registrar perdas.'); return; }
-      const weightKg = Number($('weightKg').value);
-      if (!(weightKg > 0)) { formError('Informe um peso de refugo maior que zero.'); return; }
+      const weightKg = Number(String($('weightKg').value).trim().replace(',', '.'));
+      if (!(weightKg > 0) || !Number.isFinite(weightKg)) { formError('Informe um peso de refugo maior que zero.'); return; }
+      if (!$('defectReason').value) { formError('Selecione o motivo do refugo.'); return; }
       const lossType = $('lossType').value;
-      const gram = Number($('grammage').value);
+      const product = productsCache.find(p => p.id === $('productSku').value);
+      const gram = Number(product?.grammage || $('grammage').value);
+      const observedPiecesRaw = String($('observedPieces').value || '').trim();
+      const observedPieces = observedPiecesRaw ? Number(observedPiecesRaw) : null;
+      const estimatedCheck = lossType => lossType === 'Varredura' ? null : Math.round(weightKg * 1000 / gram);
+      const estimatedForCheck = estimatedCheck($('lossType').value);
+      if (observedPieces !== null && (!Number.isInteger(observedPieces) || observedPieces < 0)) { formError('Informe uma quantidade inteira válida de peças contadas.'); return; }
+      if (observedPieces !== null && estimatedForCheck > 0 && Math.abs(observedPieces-estimatedForCheck)/estimatedForCheck > 0.5 && !confirm(`A contagem (${observedPieces}) diverge mais de 50% da estimativa (${estimatedForCheck}). Deseja registrar mesmo assim?`)) return;
       const estimatedPieces = lossType === 'Varredura' ? null : Math.round(weightKg * 1000 / gram);
       const record = {
         scrapDate: $('scrapDate').value, machine: $('machine').value,
-        lossType, color: $('lossColor').value, grammage: gram,
+        lossType, defectReason: $('defectReason').value, shift: $('shift').value, productSku: product?.sku || '', productDescription: product?.description || '', observedPieces, color: $('lossColor').value, grammage: gram,
         supplier: $('supplier').value, weightKg,
-        estimatedPieces, costKg: null, estimatedCost: null,
+        estimatedPieces, costKg: Number(systemSettings.costPerKg) || 0, estimatedCost: (Number(systemSettings.costPerKg) || 0) * weightKg,
         notes: $('notes').value.trim(), userId: currentUser.uid,
         operatorName: currentProfile?.fullName || currentUser.email,
-        createdAt: serverTimestamp(), updatedAt: serverTimestamp()
+        createdAt: fb.serverTimestamp(), updatedAt: fb.serverTimestamp()
       };
       try {
-        await addDoc(collection(db, 'scrapRecords'), record);
-        $('scrapForm').reset(); $('scrapDate').value = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
-        $('grammage').value = '18'; $('supplier').value = 'Fortpet';
-        $('formMessage').className = 'notice'; $('formMessage').textContent = 'Refugo registrado com sucesso.';
-        await loadRecords(); switchPage('dashboard');
-      } catch (err) { formError(firebaseMessage(err)); }
+        await fb.addDoc(fb.collection(db, 'scrapRecords'), record);
+      } catch (err) {
+        console.error('Falha ao gravar refugo:', err);
+        formError(firebaseMessage(err));
+        return;
+      }
+      $('scrapForm').reset();
+      $('scrapDate').value = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+      $('grammage').value = '18'; $('supplier').value = 'Fortpet'; $('observedPieces').value=''; $('defectReason').value=''; $('shift').value='1º turno'; $('productSku').value='';
+      $('formMessage').className = 'notice';
+      $('formMessage').textContent = persistenceReady ? 'Refugo registrado. Se estiver offline, ficará na fila e sincronizará quando a conexão voltar.' : 'Refugo registrado com sucesso.';
+      toast('Apontamento salvo');
+      await loadRecords();
+      switchPage('dashboard');
     });
     function formError(msg) { $('formMessage').className = 'error'; $('formMessage').textContent = msg; $('formMessage').classList.remove('hidden'); }
 
@@ -321,40 +429,207 @@
       if (!currentUser || !db) return;
       try {
         let q;
-        if (canSeeAll()) q = query(collection(db,'scrapRecords'), orderBy('createdAt','desc'), limit(200));
-        else q = query(collection(db,'scrapRecords'), where('userId','==',currentUser.uid), orderBy('createdAt','desc'), limit(200));
-        const snap = await getDocs(q);
+        if (canSeeAll()) q = fb.query(fb.collection(db,'scrapRecords'), fb.orderBy('createdAt','desc'), fb.limit(200));
+        else q = fb.query(fb.collection(db,'scrapRecords'), fb.where('userId','==',currentUser.uid), fb.orderBy('createdAt','desc'), fb.limit(200));
+        const snap = await fb.getDocs(q);
         records = snap.docs.map(d => ({id:d.id,...d.data()}));
         renderDashboard(); renderHistory();
       } catch (err) { console.error(err); records = []; renderDashboard(); renderHistory(); }
     }
 
     function renderDashboard() {
-      const kg = records.reduce((s,r)=>s+(Number(r.weightKg)||0),0);
-      const pieces = records.reduce((s,r)=>s+(Number(r.estimatedPieces)||0),0);
-      const cost = records.reduce((s,r)=>s+(Number(r.estimatedCost)||0),0);
+      const activeRecords = records.filter(r=>!r.voided);
+      const kg = activeRecords.reduce((s,r)=>s+(Number(r.weightKg)||0),0);
+      const pieces = activeRecords.reduce((s,r)=>s+(Number(r.estimatedPieces)||0),0);
+      const cost = activeRecords.reduce((s,r)=>s+(Number(r.estimatedCost)||0),0);
       $('totalKg').textContent = `${num(kg)} kg`;
       $('totalPieces').textContent = num(pieces);
       $('totalCost').textContent = brl(cost);
-      $('recentTable').innerHTML = tableHTML(records.slice(0,5));
+      $('recentTable').innerHTML = tableHTML(activeRecords.slice(0,5));
+      bindRecordActions('recentTable');
       const types = ['Garrafa','Pré-forma','Varredura'];
       const total = kg || 1;
       $('typeSummary').innerHTML = records.length ? types.map(t => {
-        const v = records.filter(r=>r.lossType===t).reduce((s,r)=>s+(Number(r.weightKg)||0),0);
+        const v = activeRecords.filter(r=>r.lossType===t).reduce((s,r)=>s+(Number(r.weightKg)||0),0);
         return `<div style="margin:16px 0"><div style="display:flex;justify-content:space-between;gap:12px;font-size:13px;font-weight:700;margin-bottom:7px"><span>${t}</span><span>${num(v)} kg</span></div><div style="height:8px;background:#eceef1;border-radius:99px;overflow:hidden"><div style="height:100%;width:${Math.min(100,v/total*100)}%;background:var(--red);border-radius:99px"></div></div></div>`;
       }).join('') : 'Ainda não há apontamentos registrados.';
+      renderPareto();
     }
     function tableHTML(list) {
+      list = list.filter(r=>!r.voided);
       if (!list.length) return '<div class="empty">Nenhum apontamento para exibir.</div>';
-      return `<div class="table-wrap"><table><thead><tr><th>Data</th><th>Máquina</th><th>Tipo</th><th>Cor</th><th>Peso</th><th>Operador</th></tr></thead><tbody>${list.map(r=>`<tr><td>${esc(r.scrapDate||'')}</td><td>${esc(r.machine||'')}</td><td><span class="pill pill-red">${esc(r.lossType||'')}</span></td><td>${esc(r.color||'')}</td><td>${num(Number(r.weightKg)||0)} kg</td><td>${esc(r.operatorName||'')}</td></tr>`).join('')}</tbody></table></div>`;
+      const actionsHeader = canEdit() ? '<th>Ações</th>' : '';
+      return `<div class="table-wrap"><table><thead><tr><th>Data</th><th>Máquina</th><th>Tipo</th><th>Cor</th><th>Peso</th><th>Operador</th>${actionsHeader}</tr></thead><tbody>${list.map(r=>{
+        const actions = canEdit() ? `<td><div class="admin-actions"><button class="btn btn-secondary btn-sm" type="button" data-edit-record="${esc(r.id)}">Editar</button><button class="btn btn-secondary btn-sm" type="button" data-delete-record="${esc(r.id)}">Excluir</button></div></td>` : '';
+        return `<tr><td>${esc(r.scrapDate||'')}</td><td>${esc(r.machine||'')}</td><td><span class="pill pill-red">${esc(r.lossType||'')}</span></td><td>${esc(r.color||'')}</td><td>${num(Number(r.weightKg)||0)} kg</td><td>${esc(r.operatorName||'')}</td>${actions}</tr>`;
+      }).join('')}</tbody></table></div>`;
     }
-    function renderHistory() { $('historyTable').innerHTML = tableHTML(records); }
+    function bindRecordActions(containerId) {
+      const container = $(containerId); if (!container) return;
+      container.querySelectorAll('[data-edit-record]').forEach(btn => btn.addEventListener('click', () => editRecord(btn.dataset.editRecord)));
+      container.querySelectorAll('[data-delete-record]').forEach(btn => btn.addEventListener('click', () => deleteRecord(btn.dataset.deleteRecord)));
+    }
+    function filteredRecords() {
+      const shift=$('filterShift')?.value||'', machine=$('filterMachine')?.value||'', from=$('filterFrom')?.value||'', to=$('filterTo')?.value||'';
+      return records.filter(r=>(!shift||r.shift===shift)&&(!machine||r.machine===machine)&&(!from||String(r.scrapDate||'')>=from)&&(!to||String(r.scrapDate||'')<=to));
+    }
+    function renderHistory() {
+      const filtered = filteredRecords();
+      $('historyTable').innerHTML = tableHTML(filtered.filter(r=>!r.voided));
+      bindRecordActions('historyTable');
+    }
+    async function editRecord(id) {
+      if (!canEdit()) { alert('Somente liderança ou administração podem corrigir apontamentos.'); return; }
+      const r = records.find(x => x.id === id); if (!r) return;
+      const date = prompt('Data do refugo (AAAA-MM-DD):', r.scrapDate || ''); if (date === null) return;
+      const machine = prompt('Máquina:', r.machine || ''); if (machine === null) return;
+      const lossType = prompt('Tipo (Garrafa, Pré-forma ou Varredura):', r.lossType || 'Garrafa'); if (lossType === null) return;
+      const color = prompt('Cor (Leitosa, Transparente ou Translúcida):', r.color || 'Leitosa'); if (color === null) return;
+      const grammageRaw = prompt('Gramatura em gramas (18, 26, 28 ou 33):', String(r.grammage ?? 18)); if (grammageRaw === null) return;
+      const supplier = prompt('Fornecedor:', r.supplier || 'Fortpet'); if (supplier === null) return;
+      const weightRaw = prompt('Peso do refugo em kg:', String(r.weightKg ?? 0)); if (weightRaw === null) return;
+      const notes = prompt('Observações:', r.notes || ''); if (notes === null) return;
+      const weightKg = Number(String(weightRaw).replace(',', '.'));
+      const grammage = Number(grammageRaw);
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !machine.trim() || !['Garrafa','Pré-forma','Varredura'].includes(lossType) || !['Leitosa','Transparente','Translúcida'].includes(color) || ![18,26,28,33].includes(grammage) || !supplier.trim() || !(weightKg > 0) || !Number.isFinite(weightKg)) {
+        alert('Dados inválidos. Confira data, máquina, tipo, cor, gramatura, fornecedor e peso.'); return;
+      }
+      const estimatedPieces = lossType === 'Varredura' ? null : Math.round(weightKg * 1000 / grammage);
+      const costKg = Number(systemSettings.costPerKg) || Number(r.costKg) || 0;
+      const updated = {scrapDate:date, machine:machine.trim(), lossType, color, grammage, supplier:supplier.trim(), weightKg, estimatedPieces, costKg, estimatedCost:costKg*weightKg, notes:notes.trim(), updatedAt:fb.serverTimestamp()};
+      try {
+        await fb.addDoc(fb.collection(db,'auditLogs'), {recordId:id, action:'UPDATE', before:{scrapDate:r.scrapDate,machine:r.machine,lossType:r.lossType,weightKg:r.weightKg,grammage:r.grammage,defectReason:r.defectReason||''}, after:{scrapDate:updated.scrapDate,machine:updated.machine,lossType:updated.lossType,weightKg:updated.weightKg,grammage:updated.grammage}, actorUid:currentUser.uid, actorName:currentProfile?.fullName||currentUser.email, createdAt:fb.serverTimestamp()});
+        await fb.updateDoc(fb.doc(db,'scrapRecords',id), updated);
+        const local = records.find(x=>x.id===id); if (local) Object.assign(local, updated);
+        renderDashboard(); renderHistory();
+        alert('Apontamento atualizado com sucesso.');
+      } catch(err) { console.error(err); alert('Não foi possível editar o apontamento: '+firebaseMessage(err)); }
+    }
+    async function deleteRecord(id) {
+      if (!canEdit()) { alert('Somente liderança ou administração podem anular apontamentos.'); return; }
+      const r = records.find(x=>x.id===id); if (!r) return;
+      if (!confirm(`Excluir definitivamente o apontamento de ${r.scrapDate || 'data não informada'} da máquina ${r.machine || 'não informada'}? Esta ação não pode ser desfeita.`)) return;
+      try {
+        await fb.addDoc(fb.collection(db,'auditLogs'), {recordId:id, action:'VOID', before:{scrapDate:r.scrapDate,machine:r.machine,lossType:r.lossType,weightKg:r.weightKg,operatorName:r.operatorName}, actorUid:currentUser.uid, actorName:currentProfile?.fullName||currentUser.email, createdAt:fb.serverTimestamp()});
+        await fb.updateDoc(fb.doc(db,'scrapRecords',id), {voided:true, voidedAt:fb.serverTimestamp(), voidedBy:currentUser.uid, voidReason:'Anulado pela administração'});
+        const local = records.find(x=>x.id===id); if(local) { local.voided=true; } renderDashboard(); renderHistory();
+        alert('Apontamento anulado e registrado no log de auditoria.');
+      } catch(err) { console.error(err); alert('Não foi possível excluir o apontamento: '+firebaseMessage(err)); }
+    }
 
-    $('logoutBtn').addEventListener('click', async () => { if (auth) await signOut(auth); });
+    function toast(message) {
+      let el=$('successToast'); if(!el){el=document.createElement('div');el.id='successToast';el.className='success-toast';el.setAttribute('role','status');document.body.appendChild(el);}
+      el.textContent='✓ '+message; el.classList.remove('hidden'); setTimeout(()=>el?.classList.add('hidden'),2600);
+    }
+    $('darkModeBtn').addEventListener('click',()=>{document.body.classList.toggle('dark-mode');document.documentElement.classList.toggle('dark-mode');$('darkModeBtn').textContent=document.body.classList.contains('dark-mode')?'☀':'☾';});
+    function renderPareto() {
+      const active=records.filter(r=>!r.voided); const counts={};
+      active.forEach(r=>{const k=r.defectReason||r.lossType||'Não informado';counts[k]=(counts[k]||0)+1;});
+      const sorted=Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,10); const labels=sorted.map(x=>x[0]), values=sorted.map(x=>x[1]);
+      const cumulative=[]; let total=values.reduce((a,b)=>a+b,0), sum=0; values.forEach(v=>{sum+=v;cumulative.push(total?sum/total*100:0);});
+      const canvas=$('paretoChart'); if(!canvas)return;
+      if(typeof Chart==='undefined'){ $('paretoFallback').classList.remove('hidden'); $('paretoFallback').textContent=sorted.length?sorted.map((x,i)=>`${i+1}. ${x[0]}: ${x[1]} (${cumulative[i].toFixed(1)}% acumulado)`).join(' · '):'Ainda não há dados suficientes para o Pareto.'; return; }
+      $('paretoFallback').classList.add('hidden'); if(paretoInstance)paretoInstance.destroy();
+      paretoInstance=new Chart(canvas,{type:'bar',data:{labels,datasets:[{type:'bar',label:'Ocorrências',data:values,yAxisID:'y'},{type:'line',label:'% acumulado',data:cumulative,yAxisID:'y1',tension:.2}]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},scales:{y:{beginAtZero:true,title:{display:true,text:'Ocorrências'}},y1:{beginAtZero:true,min:0,max:100,position:'right',grid:{drawOnChartArea:false},ticks:{callback:v=>v+'%'},title:{display:true,text:'Acumulado'}}}}});
+    }
+    async function loadCatalogs() {
+      if(!currentUser||!['administrador','lideranca'].includes(normalizedRole()))return;
+      try {
+        const [ps,rs,ls]=await Promise.all(['products','scrapReasons','productionLines'].map(c=>fb.getDocs(fb.collection(db,c))));
+        productsCache=ps.docs.map(d=>({id:d.id,...d.data()})); reasonsCache=rs.docs.map(d=>({id:d.id,...d.data()})); linesCache=ls.docs.map(d=>({id:d.id,...d.data()}));
+        if(productsCache.length){$('productSku').innerHTML='<option value="">Selecione produto (opcional)</option>'+productsCache.map(p=>`<option value="${esc(p.id)}">${esc(p.sku)} · ${esc(p.description)} (${esc(p.grammage)} g)</option>`).join('');}
+        if(reasonsCache.length){$('defectReason').innerHTML='<option value="">Selecione o motivo</option>'+reasonsCache.map(r=>`<option>${esc(r.name)}</option>`).join('');}
+        if(linesCache.length){$('machine').innerHTML='<option value="">Selecione a linha</option>'+linesCache.map(l=>`<option>${esc(l.name)}</option>`).join('');$('filterMachine').innerHTML='<option value="">Todas</option>'+linesCache.map(l=>`<option>${esc(l.name)}</option>`).join('');}
+        $('productsList').textContent=productsCache.map(p=>`${p.sku}: ${p.description} (${p.grammage} g)`).join(' • ')||'Nenhum produto cadastrado.';
+        $('reasonsList').textContent=reasonsCache.map(r=>r.name).join(' • ')||'Nenhum motivo cadastrado.';
+        $('linesList').textContent=linesCache.map(l=>l.name).join(' • ')||'Nenhuma linha cadastrada.';
+      } catch(err) { console.error('Cadastros mestres:',err); showInlineMessage('catalogsMessage','Não foi possível carregar os cadastros. Publique as regras do Firestore fornecidas junto com o HTML.',true); }
+    }
+    async function saveCatalog(collectionName,data) {
+      if(!['administrador','lideranca'].includes(normalizedRole()))throw new Error('Acesso restrito à liderança e administração.');
+      await fb.addDoc(fb.collection(db,collectionName),{...data,active:true,createdAt:fb.serverTimestamp(),createdBy:currentUser.uid}); await loadCatalogs(); toast('Cadastro salvo');
+    }
+    $('productForm').addEventListener('submit',async e=>{e.preventDefault();try{await saveCatalog('products',{sku:$('productCode').value.trim(),description:$('productDescription').value.trim(),grammage:Number($('productGrammage').value)});e.target.reset();}catch(err){showInlineMessage('catalogsMessage','Falha ao salvar produto: '+firebaseMessage(err),true);}});
+    $('reasonForm').addEventListener('submit',async e=>{e.preventDefault();try{await saveCatalog('scrapReasons',{name:$('reasonName').value.trim()});e.target.reset();}catch(err){showInlineMessage('catalogsMessage','Falha ao salvar motivo: '+firebaseMessage(err),true);}});
+    $('lineForm').addEventListener('submit',async e=>{e.preventDefault();try{await saveCatalog('productionLines',{name:$('lineName').value.trim()});e.target.reset();}catch(err){showInlineMessage('catalogsMessage','Falha ao salvar linha: '+firebaseMessage(err),true);}});
+    $('productSku').addEventListener('change',()=>{const p=productsCache.find(x=>x.id===$('productSku').value);if(p){const grams=Number(p.grammage);if(grams>0&&Number.isFinite(grams)){const option=[...$('grammage').options].find(o=>Number(o.value)===grams);if(option)$('grammage').value=String(grams);else{const o=document.createElement('option');o.value=String(grams);o.textContent=grams+' g';$('grammage').appendChild(o);$('grammage').value=String(grams);}}}});
+    ['filterShift','filterMachine','filterFrom','filterTo'].forEach(id=>$(id).addEventListener('change',renderHistory));
+    $('clearFiltersBtn').addEventListener('click',()=>{['filterShift','filterMachine','filterFrom','filterTo'].forEach(id=>$(id).value='');renderHistory();});
+    $('exportCsvBtn').addEventListener('click',()=>{const list=filteredRecords().filter(r=>!r.voided);const cols=['scrapDate','shift','machine','productSku','lossType','defectReason','color','grammage','weightKg','estimatedPieces','estimatedCost','operatorName','notes'];const csv=[cols.join(';'),...list.map(r=>cols.map(k=>'"'+String(r[k]??'').replace(/"/g,'""')+'"').join(';'))].join('\r\n');const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='relatorio_refugos_fortuce.csv';a.click();URL.revokeObjectURL(url);});
+
+    function showInlineMessage(id, message, isError=false) {
+      const el = $(id); el.textContent = message; el.classList.remove('hidden');
+      el.className = isError ? 'error' : 'notice';
+    }
+    async function loadUsers() {
+      if (!currentUser || !['administrador','lideranca'].includes(normalizedRole())) return;
+      $('usersTable').innerHTML = '<div class="empty">Carregando usuários...</div>';
+      try {
+        const snap = await fb.getDocs(fb.query(fb.collection(db,'users'), fb.orderBy('fullName')));
+        usersCache = snap.docs.map(d => ({id:d.id,...d.data()}));
+        renderUsers();
+      } catch (err) {
+        console.error('Erro ao carregar usuários:', err);
+        $('usersTable').innerHTML = '<div class="empty">Não foi possível carregar os usuários. Confira as regras do Firestore.</div>';
+      }
+    }
+    function renderUsers() {
+      if (!usersCache.length) { $('usersTable').innerHTML = '<div class="empty">Nenhum usuário encontrado.</div>'; return; }
+      $('usersTable').innerHTML = `<table><thead><tr><th>Nome</th><th>E-mail</th><th>Perfil</th><th>Status</th><th>Ações</th></tr></thead><tbody>${usersCache.map(u => {
+        const self = u.id === currentUser?.uid;
+        const role = ['operador','lideranca','administrador'].includes(u.role) ? u.role : 'operador';
+        const roleCell = isAdmin() && !self
+          ? `<select data-user-role="${esc(u.id)}"><option value="operador" ${role==='operador'?'selected':''}>Operador</option><option value="lideranca" ${role==='lideranca'?'selected':''}>Liderança</option><option value="administrador" ${role==='administrador'?'selected':''}>Administrador</option></select>`
+          : `<span class="pill">${({operador:'Operador',lideranca:'Liderança',administrador:'Administrador'})[role]}</span>`;
+        const active = u.active !== false;
+        const status = `<span class="pill ${active?'status-active':'status-inactive'}">${active?'Ativo':'Inativo'}</span>`;
+        const action = self ? '<span class="muted small">Sua conta</span>' : `<button class="btn btn-secondary" data-toggle-user="${esc(u.id)}" type="button">${active?'Desativar':'Ativar'}</button>`;
+        return `<tr><td>${esc(u.fullName || `${u.firstName||''} ${u.lastName||''}`.trim() || 'Sem nome')}</td><td>${esc(u.employeeId||'')}</td><td>${esc(u.shift||'')}</td><td>${esc(u.email||'')}</td><td>${roleCell}</td><td>${status}</td><td><div class="admin-actions">${action}</div></td></tr>`;
+      }).join('')}</tbody></table>`;
+      $('usersTable').querySelectorAll('[data-toggle-user]').forEach(btn => btn.addEventListener('click', async () => {
+        const id = btn.dataset.toggleUser, u = usersCache.find(x=>x.id===id); if (!u) return;
+        const next = u.active === false;
+        if (!confirm(`${next?'Ativar':'Desativar'} o acesso de ${u.fullName || u.email || 'este usuário'}?`)) return;
+        btn.disabled = true;
+        try { await fb.updateDoc(fb.doc(db,'users',id), {active:next}); showInlineMessage('usersMessage', `Acesso ${next?'ativado':'desativado'} com sucesso.`); await loadUsers(); }
+        catch(err) { console.error(err); showInlineMessage('usersMessage', 'Não foi possível alterar o acesso: '+firebaseMessage(err), true); btn.disabled=false; }
+      }));
+      $('usersTable').querySelectorAll('[data-user-role]').forEach(sel => sel.addEventListener('change', async () => {
+        const id=sel.dataset.userRole, role=sel.value;
+        if (!isAdmin()) return;
+        try { await fb.updateDoc(fb.doc(db,'users',id), {role}); const u=usersCache.find(x=>x.id===id); if(u) u.role=role; showInlineMessage('usersMessage','Perfil atualizado com sucesso.'); }
+        catch(err) { console.error(err); showInlineMessage('usersMessage','Não foi possível alterar o perfil: '+firebaseMessage(err),true); await loadUsers(); }
+      }));
+    }
+    async function loadSettings() {
+      if (!currentUser) return;
+      try {
+        const snap = await fb.getDoc(fb.doc(db,'settings','general'));
+        systemSettings = snap.exists() ? {...systemSettings,...snap.data()} : systemSettings;
+        if (isAdmin()) $('settingCostKg').value = Number(systemSettings.costPerKg)||0;
+        $('costKg').value = Number(systemSettings.costPerKg)||0;
+      } catch(err) { console.error(err); showInlineMessage('settingsMessage','Não foi possível carregar as configurações: '+firebaseMessage(err),true); }
+    }
+    $('settingsForm').addEventListener('submit', async e => {
+      e.preventDefault(); if (!isAdmin()) return;
+      const costPerKg = Number($('settingCostKg').value);
+      if (!Number.isFinite(costPerKg) || costPerKg < 0) { showInlineMessage('settingsMessage','Informe um custo por kg válido.',true); return; }
+      $('saveSettingsBtn').disabled=true;
+      try {
+        await fb.setDoc(fb.doc(db,'settings','general'), {costPerKg, updatedAt:fb.serverTimestamp(), updatedBy:currentUser.uid}, {merge:true});
+        systemSettings.costPerKg=costPerKg; $('costKg').value=costPerKg;
+        showInlineMessage('settingsMessage','Configurações salvas. O custo será aplicado aos novos apontamentos. Os registros antigos não serão recalculados automaticamente.');
+      } catch(err) { console.error(err); showInlineMessage('settingsMessage','Falha ao salvar: '+firebaseMessage(err),true); }
+      finally { $('saveSettingsBtn').disabled=false; }
+    });
+    $('refreshUsersBtn').addEventListener('click', loadUsers);
+    // Custo do kg e permissões são carregados após a sessão ser validada.
+
+    $('logoutBtn').addEventListener('click', async () => { if (auth && fb.signOut) await fb.signOut(auth); });
     function enterApp(user, profile) {
       currentUser = user; currentProfile = profile || {role:'operador',fullName:user.email,firstName:user.email};
       $('authView').classList.add('hidden'); $('appView').classList.remove('hidden');
-      updateRoleUI(); loadRecords();
+      updateRoleUI(); switchPage('dashboard'); loadRecords();
     }
     function exitApp() {
       currentUser = null; currentProfile = null; records = [];
@@ -362,46 +637,54 @@
     }
 
     if (firebaseConfigured) {
-      const appModule = await import('https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js');
-      const authModule = await import('https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js');
-      const dbModule = await import('https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js');
-      const analyticsModule = await import('https://www.gstatic.com/firebasejs/13.1.0/firebase-analytics.js');
-      const { initializeApp } = appModule;
-      const { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } = authModule;
-      const { getFirestore, doc, setDoc, serverTimestamp, collection, addDoc, query, where, orderBy, limit, getDocs } = dbModule;
-      window._firebase = { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, doc, setDoc, serverTimestamp, collection, addDoc, query, where, orderBy, limit, getDocs };
-      const app = initializeApp(firebaseConfig);
-      auth = getAuth(app);
-      db = getFirestore(app);
-      // Analytics é opcional e só é inicializado em ambientes compatíveis.
       try {
-        if (await analyticsModule.isSupported()) analyticsModule.getAnalytics(app);
-      } catch (analyticsError) {
-        console.info('Firebase Analytics não está disponível neste ambiente.', analyticsError);
+        // Analytics foi removido da inicialização: ele não é necessário para login ou Firestore.
+        // Assim, uma falha no Analytics não bloqueia o sistema.
+        const [appModule, authModule, dbModule] = await Promise.all([
+          import('https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js'),
+          import('https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js'),
+          import('https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js')
+        ]);
+        const { initializeApp } = appModule;
+        const { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } = authModule;
+        const { getFirestore, doc, setDoc, updateDoc, deleteDoc, getDoc, serverTimestamp, collection, addDoc, query, where, orderBy, limit, getDocs, enableIndexedDbPersistence } = dbModule;
+        const app = initializeApp(firebaseConfig);
+        auth = getAuth(app);
+        db = getFirestore(app);
+        try { await enableIndexedDbPersistence(db); persistenceReady = true; } catch (persistenceError) { console.warn('Persistência offline não habilitada:', persistenceError.code || persistenceError); }
+        fb = { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, doc, setDoc, updateDoc, deleteDoc, getDoc, serverTimestamp, collection, addDoc, query, where, orderBy, limit, getDocs };
+
+        onAuthStateChanged(auth, async user => {
+          if (!user) { exitApp(); return; }
+          // O cadastro cria Auth e perfil em etapas. Não consultar o perfil antes do setDoc.
+          if (creatingProfile) return;
+          try {
+            const profileSnap = await fb.getDoc(fb.doc(db, 'users', user.uid));
+            if (!profileSnap.exists()) {
+              await fb.signOut(auth);
+              showError('Sua conta existe, mas o perfil não foi encontrado. Peça à administração para verificar o cadastro.');
+              return;
+            }
+            const profile = profileSnap.data();
+            if (profile.active === false) {
+              await fb.signOut(auth);
+              showError('Seu acesso está desativado. Procure a liderança.');
+              return;
+            }
+            enterApp(user, profile);
+            await loadSettings();
+          } catch (err) {
+            console.error('Erro ao carregar perfil:', err);
+            showError('Não foi possível carregar seu perfil: ' + firebaseMessage(err));
+          }
+        });
+      } catch (initError) {
+        firebaseInitError = initError;
+        console.error('Falha ao inicializar Firebase:', initError);
+        $('setupNotice').classList.remove('hidden');
+        $('setupNotice').textContent = 'Não foi possível iniciar a conexão com o Firebase. Atualize a página e confira o Console (F12) se o problema continuar.';
+        showError('O sistema não conseguiu iniciar a autenticação. Atualize a página e tente novamente.');
       }
-      onAuthStateChanged(auth, async user => {
-        if (!user) { exitApp(); return; }
-        // Durante o cadastro, o documento users/{uid} pode ainda estar sendo salvo.
-        // Evita a leitura prematura que disparava "Missing or insufficient permissions".
-        if (creatingProfile) return;
-        try {
-          const { getDoc, doc } = dbModule;
-          const profileSnap = await getDoc(doc(db,'users',user.uid));
-          if (!profileSnap.exists()) { await signOut(auth); showError('Perfil de usuário não encontrado. Entre em contato com o administrador.'); return; }
-          const profile = profileSnap.data();
-          if (profile.active === false) { await signOut(auth); showError('Seu acesso está desativado. Procure a liderança.'); return; }
-          enterApp(user, profile);
-        } catch (err) { console.error(err); showError('Não foi possível carregar seu perfil: '+firebaseMessage(err)); }
-      });
-      // Expose module functions used by the handlers without putting secrets in client code.
-      Object.assign(window, { });
-      // Local aliases used by module-scoped handlers.
-      globalThis.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
-      globalThis.signInWithEmailAndPassword = signInWithEmailAndPassword;
-      globalThis.setDoc = setDoc; globalThis.doc = doc; globalThis.serverTimestamp = serverTimestamp;
-      globalThis.addDoc = addDoc; globalThis.collection = collection; globalThis.query = query;
-      globalThis.where = where; globalThis.orderBy = orderBy; globalThis.limit = limit; globalThis.getDocs = getDocs;
-      globalThis.signOut = signOut;
     }
   </script>
 </body>
