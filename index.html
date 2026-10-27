@@ -190,7 +190,7 @@
     };
     const firebaseConfigured = true;
 
-    let auth, db, currentUser = null, currentProfile = null, records = [], signupMode = false;
+    let auth, db, currentUser = null, currentProfile = null, records = [], signupMode = false, creatingProfile = false;
     const $ = id => document.getElementById(id);
     const brl = n => new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(n || 0);
     const num = n => new Intl.NumberFormat('pt-BR',{maximumFractionDigits:2}).format(n || 0);
@@ -223,11 +223,27 @@
         if (signupMode) {
           const firstName = $('firstName').value.trim(), lastName = $('lastName').value.trim();
           if (!firstName || !lastName) throw new Error('Informe nome e sobrenome.');
-          const cred = await createUserWithEmailAndPassword(auth, email, password);
-          await setDoc(doc(db, 'users', cred.user.uid), {
-            firstName, lastName, fullName: `${firstName} ${lastName}`, email,
-            role: 'operador', active: true, createdAt: serverTimestamp()
-          });
+          creatingProfile = true;
+          let cred = null;
+          try {
+            cred = await createUserWithEmailAndPassword(auth, email, password);
+            const profile = {
+              firstName, lastName, fullName: `${firstName} ${lastName}`, email,
+              role: 'operador', active: true, createdAt: serverTimestamp()
+            };
+            await setDoc(doc(db, 'users', cred.user.uid), profile);
+            currentProfile = { ...profile, createdAt: new Date() };
+            enterApp(cred.user, currentProfile);
+          } catch (signupError) {
+            // Se a autenticação foi criada, mas o perfil falhou, encerra a sessão
+            // para evitar que o listener tente carregar um perfil inexistente.
+            if (cred?.user && auth?.currentUser) {
+              try { await signOut(auth); } catch (_) {}
+            }
+            throw signupError;
+          } finally {
+            creatingProfile = false;
+          }
         } else {
           await signInWithEmailAndPassword(auth, email, password);
         }
@@ -365,6 +381,9 @@
       }
       onAuthStateChanged(auth, async user => {
         if (!user) { exitApp(); return; }
+        // Durante o cadastro, o documento users/{uid} pode ainda estar sendo salvo.
+        // Evita a leitura prematura que disparava "Missing or insufficient permissions".
+        if (creatingProfile) return;
         try {
           const { getDoc, doc } = dbModule;
           const profileSnap = await getDoc(doc(db,'users',user.uid));
