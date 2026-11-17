@@ -50,7 +50,7 @@ async function loadRecords(){const snap=await getDocs(query(collection(db,"launc
 function getDateBounds(){return {from:$("dateFrom").value,to:$("dateTo").value};}
 function filteredByPeriod(){const {from,to}=getDateBounds();return records.filter(r=>(!from||r.date>=from)&&(!to||r.date<=to));}
 function sum(list){return list.reduce((a,r)=>a+Number(r.weight||0),0);}
-function normalizeLabel(value){return String(value||"").normalize("NFD").replace(/[\\u0300-\\u036f]/g,"").trim().toUpperCase();}
+function normalizeLabel(value){return String(value||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").trim().toUpperCase();}
 function renderMachineLossTable(list){
  const machines=[...new Set([...(catalogs.machines||machinesDefault),...list.map(r=>r.machine).filter(Boolean)])];
  const totals=Object.fromEntries(machines.map(m=>[m,{loss:0,sweep:0,total:0}]));
