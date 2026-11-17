@@ -72,6 +72,14 @@
           <article class="kpi"><span>Máquinas com registros</span><strong id="kpiMachines">0</strong><small>Máquinas distintas</small></article>
           <article class="kpi"><span>Média por ocorrência</span><strong id="kpiAverage">0,000 kg</strong><small>Peso médio registrado</small></article>
         </div>
+        <section class="panel dashboard-indicator">
+          <div class="panel-heading"><div><h2>Quantitativo de perdas por máquina</h2><p class="muted">Refugos de garrafas e pré-formas separados das varreduras.</p></div><span class="unit-tag">KG</span></div>
+          <div class="table-scroll dashboard-table-scroll"><table class="dashboard-matrix"><thead id="machineLossHead"></thead><tbody id="machineLossBody"></tbody></table></div>
+        </section>
+        <section class="panel dashboard-indicator">
+          <div class="panel-heading"><div><h2>Perdas por Gramatura e Cor</h2><p class="muted">Peso agrupado por fornecedor, gramatura e cor do material.</p></div><span class="unit-tag">KG</span></div>
+          <div id="supplierBreakdown" class="supplier-breakdown"></div>
+        </section>
         <article class="panel chart-panel"><div class="panel-heading"><div><h2>Evolução diária de refugo</h2><p class="muted">Peso registrado por dia.</p></div><button class="btn secondary export-chart" data-chart="dailyChart">Baixar PNG</button></div><div class="chart-box"><canvas id="dailyChart"></canvas></div></article>
         <div class="chart-grid">
           <article class="panel chart-panel"><div class="panel-heading"><div><h2>Ranking por máquina</h2><p class="muted">Clique em uma máquina para consultar o histórico.</p></div><button class="btn secondary export-chart" data-chart="machineChart">Baixar PNG</button></div><div class="chart-box"><canvas id="machineChart"></canvas></div></article>
