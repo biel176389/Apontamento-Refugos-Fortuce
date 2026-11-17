@@ -50,9 +50,39 @@ async function loadRecords(){const snap=await getDocs(query(collection(db,"launc
 function getDateBounds(){return {from:$("dateFrom").value,to:$("dateTo").value};}
 function filteredByPeriod(){const {from,to}=getDateBounds();return records.filter(r=>(!from||r.date>=from)&&(!to||r.date<=to));}
 function sum(list){return list.reduce((a,r)=>a+Number(r.weight||0),0);}
+function normalizeLabel(value){return String(value||"").normalize("NFD").replace(/[\\u0300-\\u036f]/g,"").trim().toUpperCase();}
+function renderMachineLossTable(list){
+ const machines=[...new Set([...(catalogs.machines||machinesDefault),...list.map(r=>r.machine).filter(Boolean)])];
+ const totals=Object.fromEntries(machines.map(m=>[m,{loss:0,sweep:0,total:0}]));
+ list.forEach(r=>{const machine=r.machine;if(!machine)return;if(!totals[machine])totals[machine]={loss:0,sweep:0,total:0};const weight=Number(r.weight||0),category=normalizeLabel(r.category);if(category==="GARRAFAS"||category==="PRE-FORMAS")totals[machine].loss+=weight;else if(category==="VARREDURA")totals[machine].sweep+=weight;totals[machine].total+=weight;});
+ $("machineLossHead").innerHTML=`<tr><th>Classificação</th>${machines.map(m=>`<th>${escapeHtml(m)}</th>`).join("")}</tr>`;
+ const rows=[["PERDA","loss"],["VARREDURA","sweep"],["Total Geral","total"]];
+ $("machineLossBody").innerHTML=rows.map(([label,key])=>`<tr class="${key==="total"?"total-row":""}"><th>${label}</th>${machines.map(m=>`<td>${fmt(totals[m][key])}</td>`).join("")}</tr>`).join("");
+}
+function renderSupplierBreakdown(list){
+ const groups=new Map([["FORTPET",[]]]);
+ list.forEach(r=>{const supplier=String(r.supplier||"FORTPET").trim()||"FORTPET";if(!groups.has(supplier))groups.set(supplier,[]);groups.get(supplier).push(r);});
+ const gramOrder=catalogs.grams||gramsDefault,colorOrder=catalogs.colors||colorsDefault;
+ const suppliers=[...groups.keys()].sort((a,b)=>a==="FORTPET"?-1:b==="FORTPET"?1:a.localeCompare(b,"pt-BR"));
+ const sections=suppliers.map(supplier=>{
+  const items=groups.get(supplier),supplierTotal=sum(items),gramNames=[...new Set([...gramOrder,...items.map(r=>r.gramatura).filter(Boolean)])];
+  const rows=[];
+  gramNames.forEach(gram=>{
+   const gramItems=items.filter(r=>normalizeLabel(r.gramatura)===normalizeLabel(gram)),gramTotal=sum(gramItems);
+   if(!gramItems.length)return;
+   rows.push(`<tr class="gram-total-row"><th>${escapeHtml(String(gram).toUpperCase())}</th><td>${fmt(gramTotal)}</td></tr>`);
+   const colors=[...new Set([...colorOrder,...gramItems.map(r=>r.color).filter(Boolean)])];
+   colors.forEach(color=>{const colorItems=gramItems.filter(r=>normalizeLabel(r.color)===normalizeLabel(color));if(!colorItems.length)return;rows.push(`<tr><td class="breakdown-detail">${escapeHtml(color)}</td><td>${fmt(sum(colorItems))}</td></tr>`);});
+  });
+  return `<section class="supplier-group"><div class="supplier-heading"><h3>${escapeHtml(supplier)}</h3><strong>${fmt(supplierTotal)} <small>KG</small></strong></div><div class="table-scroll"><table class="breakdown-table"><thead><tr><th>Classificação</th><th>Peso (KG)</th></tr></thead><tbody>${rows.length?rows.join(""):'<tr><td colspan="2" class="empty-breakdown">Nenhum registro no período.</td></tr>'}</tbody><tfoot><tr><th>Total do fornecedor</th><th>${fmt(supplierTotal)}</th></tr></tfoot></table></div></section>`;
+ }).join("");
+ const grandTotal=sum(list);
+ $("supplierBreakdown").innerHTML=sections+`<div class="breakdown-grand-total"><strong>Total Geral</strong><strong>${fmt(grandTotal)} KG</strong></div>`;
+}
+
 function chartDestroy(key){if(charts[key])charts[key].destroy();}
 function chartOptions(){const dark=document.documentElement.dataset.theme==="dark",fg=dark?"#eee":"#333",grid=dark?"#444":"#ddd";return {responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:fg}}},scales:{x:{ticks:{color:fg},grid:{color:grid}},y:{ticks:{color:fg},grid:{color:grid}}}};}
-function renderDashboard(){if(!$("page-dashboard")||$("page-dashboard").classList.contains("hidden"))return;const list=filteredByPeriod(),weight=sum(list),machines=[...new Set(list.map(r=>r.machine))];$("kpiWeight").textContent=fmt(weight)+" kg";$("kpiCount").textContent=list.length;$("kpiMachines").textContent=machines.length;$("kpiAverage").textContent=fmt(list.length?weight/list.length:0)+" kg";
+function renderDashboard(){if(!$("page-dashboard")||$("page-dashboard").classList.contains("hidden"))return;const list=filteredByPeriod(),weight=sum(list),machines=[...new Set(list.map(r=>r.machine))];$("kpiWeight").textContent=fmt(weight)+" kg";$("kpiCount").textContent=list.length;$("kpiMachines").textContent=machines.length;$("kpiAverage").textContent=fmt(list.length?weight/list.length:0)+" kg";renderMachineLossTable(list);renderSupplierBreakdown(list);
  const byDay={};list.forEach(r=>byDay[r.date]=(byDay[r.date]||0)+Number(r.weight));const dayKeys=Object.keys(byDay).sort();chartDestroy("daily");charts.daily=new Chart($("dailyChart"),{type:"line",data:{labels:dayKeys,datasets:[{label:"Refugo (kg)",data:dayKeys.map(k=>byDay[k]),borderColor:"#c00e30",backgroundColor:"#c00e3028",fill:true,tension:.25}]},options:chartOptions()});
  const byMachine={};list.forEach(r=>byMachine[r.machine]=(byMachine[r.machine]||0)+Number(r.weight));const machineKeys=Object.keys(byMachine).sort((a,b)=>byMachine[b]-byMachine[a]);machineChartMap=Object.fromEntries(machineKeys.map(k=>[k,k]));chartDestroy("machine");charts.machine=new Chart($("machineChart"),{type:"bar",data:{labels:machineKeys,datasets:[{label:"Peso (kg)",data:machineKeys.map(k=>byMachine[k]),backgroundColor:"#c00e30"}]},options:{...chartOptions(),onClick:(ev,els)=>{if(els.length){historyMachine=machineKeys[els[0].index];showPage("historico");}}}});
  const byCat={};list.forEach(r=>byCat[r.category]=(byCat[r.category]||0)+Number(r.weight));const catKeys=Object.keys(byCat);categoryChartMap=Object.fromEntries(catKeys.map(k=>[k,k]));chartDestroy("category");charts.category=new Chart($("categoryChart"),{type:"doughnut",data:{labels:catKeys,datasets:[{data:catKeys.map(k=>byCat[k]),backgroundColor:["#c00e30","#55585f","#a8a8a8"]}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:"bottom",labels:{color:document.documentElement.dataset.theme==="dark"?"#eee":"#333"}}},onClick:(ev,els)=>{if(els.length){historyCategory=catKeys[els[0].index];showPage("historico");}}}});
