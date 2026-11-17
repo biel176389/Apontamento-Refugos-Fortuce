@@ -54,7 +54,7 @@ function normalizeLabel(value){return String(value||"").normalize("NFD").replace
 function renderMachineLossTable(list){
  const machines=[...new Set([...(catalogs.machines||machinesDefault),...list.map(r=>r.machine).filter(Boolean)])];
  const totals=Object.fromEntries(machines.map(m=>[m,{loss:0,sweep:0,total:0}]));
- list.forEach(r=>{const machine=r.machine;if(!machine)return;if(!totals[machine])totals[machine]={loss:0,sweep:0,total:0};const weight=Number(r.weight||0),category=normalizeLabel(r.category);if(category==="GARRAFAS"||category==="PRE-FORMAS")totals[machine].loss+=weight;else if(category==="VARREDURA")totals[machine].sweep+=weight;totals[machine].total+=weight;});
+ list.forEach(r=>{const machine=r.machine;if(!machine)return;if(!totals[machine])totals[machine]={loss:0,sweep:0,total:0};const weight=Number(r.weight||0),category=normalizeLabel(r.category);if(category==="GARRAFAS"||category==="PRE-FORMAS")totals[machine].loss+=weight;else if(category==="VARREDURA")totals[machine].sweep+=weight;});Object.values(totals).forEach(t=>t.total=t.loss+t.sweep);
  $("machineLossHead").innerHTML=`<tr><th>Classificação</th>${machines.map(m=>`<th>${escapeHtml(m)}</th>`).join("")}</tr>`;
  const rows=[["PERDA","loss"],["VARREDURA","sweep"],["Total Geral","total"]];
  $("machineLossBody").innerHTML=rows.map(([label,key])=>`<tr class="${key==="total"?"total-row":""}"><th>${label}</th>${machines.map(m=>`<td>${fmt(totals[m][key])}</td>`).join("")}</tr>`).join("");
