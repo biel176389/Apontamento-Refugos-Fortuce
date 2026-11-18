@@ -9,6 +9,7 @@
   <link rel="shortcut icon" type="image/png" href="https://fortuce.com.br/wp-content/uploads/2022/05/favicon.png">
   <link rel="stylesheet" href="styles.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
 <body>
   <section id="authView" class="auth-wrap">
@@ -111,7 +112,7 @@
       <section id="page-historico" class="page hidden">
         <div class="page-heading"><div><p class="eyebrow">CONSULTA E MANUTENÇÃO</p><h1>Histórico</h1><p class="muted">Consulte, filtre, edite ou exclua lançamentos.</p></div></div>
         <div class="history-summary"><strong id="historyCount">0 registros</strong><strong id="historyWeight">0,000 kg</strong></div>
-        <div class="panel table-panel"><div class="table-tools"><input id="historySearch" placeholder="Buscar em todos os campos..."><button id="resetFilters" class="btn secondary">Limpar filtros</button></div>
+        <div class="panel table-panel"><div class="table-tools"><input id="historySearch" placeholder="Buscar em todos os campos..."><button id="resetFilters" class="btn secondary">Limpar filtros</button><button id="exportHistory" class="btn primary" type="button" disabled>Exportar Excel</button></div>
           <div class="table-scroll"><table><thead><tr><th>Data <button class="filter-btn" data-filter="date">▼</button></th><th>Máquina <button class="filter-btn" data-filter="machine">▼</button></th><th>Categoria <button class="filter-btn" data-filter="category">▼</button></th><th>Peso (KG)</th><th>Cor <button class="filter-btn" data-filter="color">▼</button></th><th>Gramatura <button class="filter-btn" data-filter="gramatura">▼</button></th><th>Fornecedor <button class="filter-btn" data-filter="supplier">▼</button></th><th>Observações</th><th>Ações</th></tr></thead><tbody id="historyBody"></tbody></table></div>
           <div id="filterPopover" class="filter-popover hidden"></div>
         </div>
