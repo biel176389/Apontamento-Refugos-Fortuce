@@ -21,7 +21,8 @@ let currentUser=null, profile=null, records=[], catalogs={}, registrationInProgr
 const fmt = n => Number(n||0).toLocaleString("pt-BR",{minimumFractionDigits:3,maximumFractionDigits:3});
 const today = () => new Date().toISOString().slice(0,10);
 const dateObj = s => new Date(`${s}T12:00:00`);
-let toastTimer;\nconst toast = msg => { const el=$("toast"); clearTimeout(toastTimer); el.textContent=msg; el.classList.add("show"); toastTimer=setTimeout(()=>el.classList.remove("show"),2000); };
+let toastTimer;
+const toast = msg => { const el=$("toast"); clearTimeout(toastTimer); el.textContent=msg; el.classList.add("show"); toastTimer=setTimeout(()=>el.classList.remove("show"),2000); };
 const setMessage = (id,msg) => $(id).textContent=msg;
 function themeInit(){const t=localStorage.getItem("fortuce-theme")||"light";document.documentElement.dataset.theme=t;$("themeIcon").textContent=t==="dark"?"☀":"☾";}
 $("themeToggle").addEventListener("click",()=>{const t=document.documentElement.dataset.theme==="dark"?"light":"dark";document.documentElement.dataset.theme=t;localStorage.setItem("fortuce-theme",t);$("themeIcon").textContent=t==="dark"?"☀":"☾";renderDashboard();});
